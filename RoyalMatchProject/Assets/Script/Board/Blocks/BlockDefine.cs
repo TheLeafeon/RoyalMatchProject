@@ -1,14 +1,14 @@
-namespace Ninez.Board
+namespace RoyalMatch.Board
 {
     public enum BlockType
     {
         EMPTY = 0,
-        BASIC = 1
+        BASIC = 1,
     }
 
     public enum BlockBreed
     {
-        NA = -1,   //Not Assigned
+        NA = -1,
         BREED_0 = 0,
         BREED_1 = 1,
         BREED_2 = 2,
@@ -16,5 +16,4 @@ namespace Ninez.Board
         BREED_4 = 4,
         BREED_5 = 5,
     }
-
 }

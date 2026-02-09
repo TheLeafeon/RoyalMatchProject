@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 824f40d1dcf92124d8a2c66b559e97be, type: 3}
+  m_Script: {fileID: 11500000, guid: f444378a74f61bc42a2e7d0836effd73, type: 3}
   m_Name: BlockConfig
-  m_EditorClassIdentifier: Assembly-CSharp::Ninez.Scriptable.BlockConfig
+  m_EditorClassIdentifier: Assembly-CSharp::RoyalMatch.Scriptable.BlockConfig
   basicBlockSprites:
   - {fileID: 7935234321397735378, guid: f4542f05912f07642bb12c62e847fb94, type: 3}
   - {fileID: 8868729072188591806, guid: c46b118861f49c34d86998cc84354cc8, type: 3}

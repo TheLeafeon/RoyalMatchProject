@@ -1,11 +1,14 @@
 using UnityEngine;
 
-namespace Ninez.Scriptable
+namespace RoyalMatch.Scriptable
 {
-    [CreateAssetMenu(menuName = "Bingle/Block Config", fileName = "BlockConfig.asset")]
+
+    [CreateAssetMenu(fileName = "BlockConfig", menuName = "Scriptable Objects/BlockConfig")]
     public class BlockConfig : ScriptableObject
     {
+
         public Sprite[] basicBlockSprites;
+
     }
 }
 
