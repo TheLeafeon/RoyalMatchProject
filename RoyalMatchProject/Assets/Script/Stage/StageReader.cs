@@ -4,19 +4,23 @@ namespace RoyalMatch.Stage
 {
     public static class StageReader
     {
-        //StageInfo 객체를 리턴하는 LoadStage 함수 , nStage: 로드할 스테이지 번호
+        /// <summary>
+        /// 스테이지 구성을 위해서 구성정보를 로드한다. 
+        /// </summary>
+        /// <param name="nStage"> 스테이지 번호</param>
+        /// <returns></returns>
         public static StageInfo LoadStage(int nStage)
         {
-            Debug.Log($"Load Stage : Stage/{ GetFileName(nStage) }" );
+            Debug.Log($"Load Stage : Stage/{GetFileName(nStage)}");
 
-            //유니티 리소스 파일을 읽어서, 스테이지 데이터를 텍스트로 담고 있는 텍스트 에셋 생성
+            //1. 리소스 파일에서 텍스트를 읽어온다.
             TextAsset textAsset = Resources.Load<TextAsset>($"Stage/{GetFileName(nStage)}");
-
             if (textAsset != null)
             {
-                //JsonUtility.FromJson()을 사용해서 읽어들인 스테이지 Json데이터를 Serialize한 Stage 객체로 생성한다.
+                //2. JSON 문자열을 객체(StageInfo)로 변환한다.
                 StageInfo stageInfo = JsonUtility.FromJson<StageInfo>(textAsset.text);
 
+                //3. 변환된 객체가 유효한지 체크한다(only Debugging)
                 Debug.Assert(stageInfo.DoValidation());
 
                 return stageInfo;
@@ -25,8 +29,12 @@ namespace RoyalMatch.Stage
             return null;
         }
 
-
-        //읽어들일 스테이지 리소스 이름을 구한다. stage_숫자 4자리로 구성된 파일 이름을 리턴한다.
+        /// <summary>
+        /// 스테이지 파일 이름을 구한다.
+        /// format : stage_0001 -> 4자릿수 네이밍 적용, 리소스 파일에서 로딩하는 경우 확장자 생략
+        /// </summary>
+        /// <param name="nStage"></param>
+        /// <returns></returns>
         static string GetFileName(int nStage)
         {
             return string.Format("stage_{0:D4}", nStage);

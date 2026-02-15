@@ -4,32 +4,41 @@ namespace RoyalMatch.Board
 {
     public class CellBehaviour : MonoBehaviour
     {
-        //참조하는 Cell 객체 선언
         Cell m_Cell;
         SpriteRenderer m_SpriteRenderer;
 
-        private void Start()
+        // Start is called before the first frame update
+        void Start()
         {
             m_SpriteRenderer = GetComponent<SpriteRenderer>();
 
-            //Cell 종류에 해당되는 Sprite가 출력되도록 UpdateView(false) 호출
             UpdateView(false);
         }
 
-        //Cell 객체 참조를 저장
+        // Update is called once per frame
+        void Update()
+        {
+
+        }
+
         public void SetCell(Cell cell)
         {
             m_Cell = cell;
         }
 
-        // Cell종류에 해당되는 Sprite를 SpriteRenderer에 저장
-        public void UpdateView(bool bValueChnaged)
+        /// <summary>
+        /// 참조하고 있는 Cell의 정보를 반영하여 Cell GameObject에 반영한다
+        /// ex) Cell 종류에 따른 Sprite 종류 업데이트
+        /// 생성자 또는 플레이도중에 Cell Type이 변경될 때 호출된다.
+        /// </summary>
+        /// <param name="bValueChanged">플레이 도중에 Type이 변경되는 경우 true, 그렇지 않은 경우 false</param>
+        public void UpdateView(bool bValueChanged)
         {
-             if(m_Cell.type == CellType.EMPTY)
+            if (m_Cell.type == CellType.EMPTY)
             {
                 m_SpriteRenderer.sprite = null;
             }
         }
+
     }
 }
-

@@ -1,22 +1,19 @@
+using RoyalMatch.Board;
 using UnityEngine;
 
 namespace RoyalMatch.Board
 {
     public class Board
     {
-        //보드의 크기(행,열) 정보를 저장하는 멤버 및 속성을 선언하고 정의한다.
         int m_nRow;
         int m_nCol;
 
-        public int maxRow {  get { return m_nRow; } }
+        public int maxRow { get { return m_nRow; } }
         public int maxCol { get { return m_nCol; } }
 
-
-        //보드를 구성하는 Cell을 저장하는 2차원 배열을 선언한다.
         Cell[,] m_Cells;
         public Cell[,] cells { get { return m_Cells; } }
 
-        //보드를 구성하는 Block을 저장하는 2차원 배열을 선언한다.
         Block[,] m_Blocks;
         public Block[,] blocks { get { return m_Blocks; } }
 
@@ -24,62 +21,95 @@ namespace RoyalMatch.Board
         GameObject m_CellPrefab;
         GameObject m_BlockPrefab;
 
-
-        //생성자. 보드 크기 정보를 저장하고, 보드 크기만큼을 저장할 수 있는 Cell과 Block 배열을 생성한다.
-        public Board(int nRow,int nCol)
+        public Board(int nRow, int nCol)
         {
             m_nRow = nRow;
             m_nCol = nCol;
 
-            m_Cells = new Cell[nRow,nCol];
-            m_Blocks = new Block[nRow,nCol];
+            m_Cells = new Cell[nRow, nCol];
+            m_Blocks = new Block[nRow, nCol];
         }
 
-
-        //주어진 리소스를 참조하여 보드 구성
         internal void ComposeStage(GameObject cellPrefab, GameObject blockPrefab, Transform container)
         {
-            //스테이지 구성에 필요한 Cell, Block, Container 정보를 저장
+            //1. 스테이지 구성에 필요한 Cell,Block, Container(Board) 정보를 저장한다. 
             m_CellPrefab = cellPrefab;
             m_BlockPrefab = blockPrefab;
             m_Container = container;
 
-            
-            //Cell, Block Prefab을 이용해서 Board에 Cell/Block GameObject를 추가
-            //row=0, col=0 에 해당되는 화면 position을 구한다.
+            //2. 3매치된 블럭이 없도록 섞는다.  
+            BoardShuffler shuffler = new BoardShuffler(this, true);
+            shuffler.Shuffle();
+
+            //3. Cell, Block Prefab을 이용해서 Board에 Cell/Block GameObject를 추가한다. 
             float initX = CalcInitX(0.5f);
             float initY = CalcInitY(0.5f);
-           
-
-            //모든 cell/block을 처리하기 위한 loop
             for (int nRow = 0; nRow < m_nRow; nRow++)
-            {
-                for (int nCol = 0;nCol < m_nCol; nCol++)
+                for (int nCol = 0; nCol < m_nCol; nCol++)
                 {
-                    //해당 row, col에 위치한 Cell객체에게 CellGameObject를 생성 하도록 요청
+                    //3.1 Cell GameObject 생성을 요청한다.GameObject가 생성되지 않는 경우에 null을 리턴한다.
                     Cell cell = m_Cells[nRow, nCol]?.InstantiateCellObj(cellPrefab, container);
-                    //생성된 Cell 객체에게 Cell GameObject의 초기 위치 설정
                     cell?.Move(initX + nCol, initY + nRow);
 
+                    //3.2 Block GameObject 생성을 요청한다.
+                    //    GameObject가 생성되지 않는 경우에 null을 리턴한다. EMPTY 인 경우에 null
                     Block block = m_Blocks[nRow, nCol]?.InstantiateBlockObj(blockPrefab, container);
                     block?.Move(initX + nCol, initY + nRow);
                 }
-            }
-            
         }
 
-
-        //row=0, col=0일때 해당되는 화면 위치 Xposition을 구한다. 9*9 보드일때 -4가 리턴된다. 
+        /// <summary>
+        /// 퍼즐의 시작 X 위치를 구한다, left - top좌표
+        /// </summary>
+        /// <param name="offset"></param>
+        /// <returns></returns>
         public float CalcInitX(float offset = 0)
         {
             return -m_nCol / 2.0f + offset;
         }
-        //row=0, col=0일때 해당되는 화면 위치 Yposition을 구한다. 9*9 보드일때 -4가 리턴된다. 
+
+        //퍼즐의 시작 Y 위치, left - bottom 좌표
+        //하단이 (0, 0) 이므로, 
         public float CalcInitY(float offset = 0)
         {
             return -m_nRow / 2.0f + offset;
         }
 
+        /*
+         * 지정된 위치가 셔플 가능한 조건인지 체크한다
+         * @bLoading true if stage being loading , on playing is false
+         */
+        public bool CanShuffle(int nRow, int nCol, bool bLoading)
+        {
+            if (!m_Cells[nRow, nCol].type.IsBlockMovableType())
+                return false;
+
+            return true;
+        }
+
+        /*
+         * Block의 종류(breed)를 변경한다.
+         */
+        public void ChangeBlock(Block block, BlockBreed notAllowedBreed)
+        {
+            BlockBreed genBreed;
+
+            while (true)
+            {
+                genBreed = (BlockBreed)UnityEngine.Random.Range(0, 6); //TODO 스테이지파일에서 Spawn 정책을 이용해야함
+
+                if (notAllowedBreed == genBreed)
+                    continue;
+
+                break;
+            }
+
+            block.breed = genBreed;
+        }
+
+        public bool IsSwipeable(int nRow, int nCol)
+        {
+            return m_Cells[nRow, nCol].type.IsBlockMovableType();
+        }
     }
 }
-

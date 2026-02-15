@@ -7,6 +7,11 @@ using UnityEngine;
  */
 namespace RoyalMatch.Stage
 {
+    /// <summary>
+    /// stage 파일에서 읽어온 정보 (스테이지 구성에 사용) 
+    /// Note : 멤버 네이밍은 m_ 붙이지 않는다.
+    /// JSON 파일을 serialize하는 경우 json 키 값과 변수 이름이 일치해야 된다.
+    /// </summary>
     [System.Serializable]
     public class StageInfo
     {
@@ -15,41 +20,46 @@ namespace RoyalMatch.Stage
 
         public int[] cells;
 
-        //디버깅 용도. StageInfo의 멤버를 다시 JSON으로 변환해서 결과를 확인하는데 사용한다.
         public override string ToString()
         {
             return JsonUtility.ToJson(this);
         }
 
-
-        //요청한 위치에 CellType을 리턴하는 메소드
+        /// <summary>
+        /// 지정된 위치의 Cell Type을 구한다
+        /// </summary>
+        /// <param name="nRow">행</param>
+        /// <param name="nCol">열</param>
+        /// <returns></returns>
         public CellType GetCellType(int nRow, int nCol)
         {
-            //요청한 위치가 유효한지 확인
-            Debug.Assert(cells != null && cells.Length > nRow *  col +nCol);
+            Debug.Assert(cells != null && cells.Length > nRow * col + nCol, $"Invalid Row/Col = {nRow}, {nCol}");
 
-            //배열에 저장된값 1,0 에 따라서 CellType 반환
-            if (cells.Length > nRow * col + nCol)
-                return (CellType)cells[nRow * col + nCol];
+            //if (cells.Length > nRow * col + nCol)
+            //    return (CellType)cells[nRow * col + nCol];
+
+            int revisedRow = (row - 1) - nRow;
+            if (cells.Length > revisedRow * col + nCol)
+                return (CellType)cells[revisedRow * col + nCol];
 
             Debug.Assert(false);
 
             return CellType.EMPTY;
         }
 
-        //JSON 데이터 유효성 검사를 수행하는 메소드
+        /// <summary>
+        /// 생성된 정보가 유효한지 검사한다 
+        /// </summary>
+        /// <returns>유효하면 ture, 그렇지 않으면 false</returns>
         public bool DoValidation()
         {
             Debug.Assert(cells.Length == row * col);
-            Debug.Log($"cell length : {cells.Length}, row, col = ({row},{col})");
+            Debug.Log($"cell length : {cells.Length}, row, col = ({row}, {col})");
 
-            //블럭 크기와 배열 크기가 다른경우 return 한다.
             if (cells.Length != row * col)
                 return false;
 
             return true;
         }
-
     }
 }
-
