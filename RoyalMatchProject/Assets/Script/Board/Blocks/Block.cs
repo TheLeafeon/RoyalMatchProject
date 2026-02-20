@@ -142,6 +142,23 @@ namespace RoyalMatch.Board
         {
             return !(type == BlockType.EMPTY);
         }
+
+        //블럭의 위치를 주어진 위치로 정해진 시간동안 이동하는 메소드
+        //코루틴을 생성해서 Action2D 객체에 Move애니메이션을 위임한다.
+        public void MoveTo(Vector3 to, float duration)
+        {
+            m_BlockBehaviour.StartCoroutine(Util.Action2D.MoveTo(blockObj, to, duration));
+
+        }
+
+        //swipe 가능한 블럭인지 체크한다.
+        //baseBlock : 스와이프 기준 블럭, 기준블럭의 종류에 따라서 가능 여부가 달라진다.
+        //확장성을 고려해서 제공하는 메소드로 현재는 조건없이 true를 리턴한다.
+        public bool IsSwipeable(Block baseBlock)
+        {
+            return true;
+        }
+
     }
 }
 

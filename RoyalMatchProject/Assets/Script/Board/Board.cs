@@ -21,6 +21,7 @@ namespace RoyalMatch.Board
         GameObject m_CellPrefab;
         GameObject m_BlockPrefab;
 
+       
         public Board(int nRow, int nCol)
         {
             m_nRow = nRow;
@@ -111,5 +112,7 @@ namespace RoyalMatch.Board
         {
             return m_Cells[nRow, nCol].type.IsBlockMovableType();
         }
+
+        
     }
 }

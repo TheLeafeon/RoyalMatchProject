@@ -12,6 +12,7 @@ namespace RoyalMatch.Util
         DOWN = 3
     }
 
+    //스와이프 액션이 수행될 때 대상 블럭의 위치 offset를 구하는 역할을 수행
     public static class SwipeDirMethod
     {
         public static int GetTargetRow(this Swipe swipeDir)

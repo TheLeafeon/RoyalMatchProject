@@ -1,6 +1,8 @@
 using RoyalMatch.Board;
 using UnityEngine;
 using RoyalMatch.Util;
+using RoyalMatch.Core;
+using System.Collections;
 
 namespace RoyalMatch.Stage
 {
@@ -31,9 +33,7 @@ namespace RoyalMatch.Stage
             m_Board = new RoyalMatch.Board.Board(nRow, nCol);
         }
 
-        /// <summary>
         /// 주어진 정보(Cell/Block Prefab, 컨테이너)를 이용해서 Board를 구성한다.
-        /// </summary>
         /// <param name="cellPrefab">Cell Prefab</param>
         /// <param name="blockPrefab">Board Prefab</param>
         /// <param name="container">Cell/Board GameObject의 부모 GameObject</param>
@@ -104,6 +104,70 @@ namespace RoyalMatch.Stage
 
             Debug.Log(strCells.ToString());
             Debug.Log(strBlocks.ToString());
+        }
+
+
+        //스와이프 대상은 블럭 -> 블럭의 정보는 보드가 관리하고 있음 -> 보드에 대한 명령은 Stage가 총괄
+        // 그러므로 스와이프 액션은 Stage에서 요청할 것
+        public IEnumerator CoDoSwipeAction(int nRow, int nCol, Swipe swipeDir, Returnable<bool> actionResult)
+        {
+            //코루틴 실행 결과를 전달하는 객체에 초기값으로 false를 설정
+            actionResult.value = false;
+
+
+            int nSwipeRow = nRow, nSwipeCol = nCol;
+            nSwipeRow += swipeDir.GetTargetRow();
+            nSwipeCol += swipeDir.GetTargetCol();
+
+            Debug.Assert(nRow != nSwipeRow || nCol != nSwipeCol, "Invalid Swipe : ({nSwipeRow} , {nSwipeCol})");
+            Debug.Assert(nSwipeRow >= 0 && nSwipeCol < maxRow && nSwipeCol >= 0 && nSwipeCol < maxCol, $"Swipe 타겟 블럭 인덱스 오류 = ({nSwipeRow},{nSwipeCol})");
+
+            //스와이프 대상이 되는 두개의 블럭 정보를 구해서 스와이프 액션을 실행한다.
+            if (m_Board.IsSwipeable(nSwipeRow,nSwipeCol))
+            {
+                //스와이프 대상 Block 객체와 위치 정보를 구하기
+                Block targetBlock = blocks[nSwipeRow, nSwipeCol];
+                Block baseBlock = blocks[nRow, nCol];
+
+                Debug.Assert(baseBlock != null && targetBlock != null);
+
+                Vector3 basePos = baseBlock.blockObj.transform.position;
+                Vector3 targetPos = targetBlock.blockObj.transform.position;
+
+                if(targetBlock.IsSwipeable(baseBlock))
+                {
+                    //블럭에게 지정된 위치로 이동하도록 요청
+                    //프레임마다 블럭이 이동하는 모습을 볼 수 있다.
+                    //이동을 요청받은 블럭은 코루틴을 생성해서 프레임마다 블럭의 위치를 변경할 것이다.
+                    baseBlock.MoveTo(targetPos, Constants.SWIPE_DURATION);
+                    targetBlock.MoveTo(basePos, Constants.SWIPE_DURATION);
+
+                    //스와이프 액션이 실행되는 동안 대기한다.
+                    yield return new WaitForSeconds(Constants.SWIPE_DURATION);
+
+                    //스와이프 액션이 종료되면 보드에 저장된 블럭의 위치를 서로 바꾼다.
+                    //최종적으로 스와이프 대상 2개의 블럭 위치가 변경된다.
+                    blocks[nRow, nCol] = targetBlock;
+                    blocks[nSwipeRow, nSwipeCol] = baseBlock;
+
+                    //액션 수행 결과로 true를 설정한다.
+                    actionResult.value = true;
+                }
+            }
+            yield break;
+        }
+
+        //주어진 위치가 스와이프 액션이 유효한지 체크하는 메소드
+        public bool IsValideSwipe(int nRow, int nCol, Swipe swipeDir)
+        {
+            switch(swipeDir)
+            {
+                case Swipe.DOWN: return nRow > 0; 
+                case Swipe.UP: return nRow < maxRow - 1; 
+                case Swipe.LEFT: return nCol > 0; 
+                case Swipe.RIGHT:return nCol < maxCol - 1;
+                default: return false;
+            }
         }
     }
 }
