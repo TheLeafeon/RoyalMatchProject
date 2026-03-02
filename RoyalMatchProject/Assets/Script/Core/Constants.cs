@@ -1,14 +1,11 @@
-using UnityEngine;
-namespace RoyalMatch.Core
-{
+ï»¿using UnityEngine;
 
-    //¾ÕÀ¸·Î ÁøÇàÇÏ¸é¼­ »ç¿ëÇÒ »ó¼ö¸¦ Á¤ÀÇÇÏ´Â static Å¬·¡½º
+namespace Ninez.Core
+{
     public static class Constants
     {
-        public static float BLOCK_ORG = 0.5f;   //ºí·°ÀÇ Ãâ·Â ¿øÁ¡
-        public static float SWIPE_DURATION = 0.2f; // ºí·° ½º¿ÍÀÌÇÁ ¾Ö´Ï¸ŞÀÌ¼Ç ½Ã°£
+        public static float BLOCK_ORG = 0.5f;           //ë¸”ëŸ­ì˜ ì¶œë ¥ ì›ì 
+        public static float SWIPE_DURATION = 0.2f;      //ë¸”ëŸ­ ìŠ¤ì™€ì´í”„ ì• ë‹ˆë©”ì´ì…˜ ì‹œê°„
+        public static float BLOCK_DESTROY_SCALE = 0.3f; //ë¸”ëŸ­ì´ ì‚­ì œë  ë•Œ ì¤„ì–´ë“œëŠ” í¬ê¸°
     }
-
-
 }
-

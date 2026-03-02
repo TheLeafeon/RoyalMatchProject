@@ -1,7 +1,11 @@
-namespace RoyalMatch.Util
+ï»¿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Ninez.Util
 {
     /**
-     * ºí·°ÀÇ À§Ä¡¸¦ ÀúÀåÇÏ´Â structure
+     * ë¸”ëŸ­ì˜ ìœ„ì¹˜ë¥¼ ì €ì¥í•˜ëŠ” structure
      */
     public struct BlockPos
     {
@@ -15,7 +19,7 @@ namespace RoyalMatch.Util
         }
 
         //----------------------------------------------------------------------
-        // Struct ÇÊ¼ö override function
+        // Struct í•„ìˆ˜ override function
         //----------------------------------------------------------------------
         public override bool Equals(object obj)
         {

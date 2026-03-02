@@ -1,6 +1,9 @@
+ï»¿using System.Collections;
+using System.Collections.Generic;
+using Ninez.Board;
 using UnityEngine;
 
-namespace RoyalMatch.Board
+namespace Ninez.Board
 {
     public class CellBehaviour : MonoBehaviour
     {
@@ -27,11 +30,11 @@ namespace RoyalMatch.Board
         }
 
         /// <summary>
-        /// ÂüÁ¶ÇÏ°í ÀÖ´Â CellÀÇ Á¤º¸¸¦ ¹İ¿µÇÏ¿© Cell GameObject¿¡ ¹İ¿µÇÑ´Ù
-        /// ex) Cell Á¾·ù¿¡ µû¸¥ Sprite Á¾·ù ¾÷µ¥ÀÌÆ®
-        /// »ı¼ºÀÚ ¶Ç´Â ÇÃ·¹ÀÌµµÁß¿¡ Cell TypeÀÌ º¯°æµÉ ¶§ È£ÃâµÈ´Ù.
+        /// ì°¸ì¡°í•˜ê³  ìˆëŠ” Cellì˜ ì •ë³´ë¥¼ ë°˜ì˜í•˜ì—¬ Cell GameObjectì— ë°˜ì˜í•œë‹¤
+        /// ex) Cell ì¢…ë¥˜ì— ë”°ë¥¸ Sprite ì¢…ë¥˜ ì—…ë°ì´íŠ¸
+        /// ìƒì„±ì ë˜ëŠ” í”Œë ˆì´ë„ì¤‘ì— Cell Typeì´ ë³€ê²½ë  ë•Œ í˜¸ì¶œëœë‹¤.
         /// </summary>
-        /// <param name="bValueChanged">ÇÃ·¹ÀÌ µµÁß¿¡ TypeÀÌ º¯°æµÇ´Â °æ¿ì true, ±×·¸Áö ¾ÊÀº °æ¿ì false</param>
+        /// <param name="bValueChanged">í”Œë ˆì´ ë„ì¤‘ì— Typeì´ ë³€ê²½ë˜ëŠ” ê²½ìš° true, ê·¸ë ‡ì§€ ì•Šì€ ê²½ìš° false</param>
         public void UpdateView(bool bValueChanged)
         {
             if (m_Cell.type == CellType.EMPTY)

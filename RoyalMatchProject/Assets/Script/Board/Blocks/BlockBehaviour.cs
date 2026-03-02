@@ -1,7 +1,10 @@
-using RoyalMatch.Scriptable;
+ï»¿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using Ninez.Scriptable;
 
-namespace RoyalMatch.Board
+namespace Ninez.Board
 {
     public class BlockBehaviour : MonoBehaviour
     {
@@ -16,33 +19,63 @@ namespace RoyalMatch.Board
             UpdateView(false);
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
-
         internal void SetBlock(Block block)
         {
             m_Block = block;
         }
 
         /// <summary>
-        /// ÂüÁ¶ÇÏ°í ÀÖ´Â BlockÀÇ º¸¸¦ ¹İ¿µÇÏ¿© Block GameObject¿¡ ¹İ¿µÇÑ´Ù
-        /// ex) Block Á¾·ù¿¡ µû¸¥ Sprite Á¾·ù ¾÷µ¥ÀÌÆ®
-        /// »ı¼ºÀÚ ¶Ç´Â ÇÃ·¹ÀÌµµÁß¿¡ Block TypeÀÌ º¯°æµÉ ¶§ È£ÃâµÈ´Ù.
+        /// ì°¸ì¡°í•˜ê³  ìˆëŠ” Blockì˜ ë³´ë¥¼ ë°˜ì˜í•˜ì—¬ Block GameObjectì— ë°˜ì˜í•œë‹¤
+        /// ex) Block ì¢…ë¥˜ì— ë”°ë¥¸ Sprite ì¢…ë¥˜ ì—…ë°ì´íŠ¸
+        /// ìƒì„±ì ë˜ëŠ” í”Œë ˆì´ë„ì¤‘ì— Block Typeì´ ë³€ê²½ë  ë•Œ í˜¸ì¶œëœë‹¤.
         /// </summary>
-        /// <param name="bValueChanged">ÇÃ·¹ÀÌ µµÁß¿¡ TypeÀÌ º¯°æµÇ´Â °æ¿ì true, ±×·¸Áö ¾ÊÀº °æ¿ì false</param>
+        /// <param name="bValueChanged">í”Œë ˆì´ ë„ì¤‘ì— Typeì´ ë³€ê²½ë˜ëŠ” ê²½ìš° true, ê·¸ë ‡ì§€ ì•Šì€ ê²½ìš° false</param>
         public void UpdateView(bool bValueChanged)
         {
             if (m_Block.type == BlockType.EMPTY)
             {
                 m_SpriteRenderer.sprite = null;
             }
-            else if (m_Block.type == BlockType.BASIC)
+            else if(m_Block.type == BlockType.BASIC)
             {
                 m_SpriteRenderer.sprite = m_BlockConfig.basicBlockSprites[(int)m_Block.breed];
             }
         }
+
+        /*
+         * ë¸”ëŸ­ì„ ì œê±°í•œë‹¤.  
+         */
+        public void DoActionClear()
+        {
+            StartCoroutine(CoStartSimpleExplosion(true));
+        }
+
+        /*
+         * ë¸”ëŸ­ì´ í­ë°œí•œ í›„, GameObjectë¥¼ ì‚­ì œí•œë‹¤.
+         */
+        IEnumerator CoStartSimpleExplosion(bool bDestroy = true)
+        {
+            //1. í¬ê¸°ê°€ ì¤„ì–´ë“œëŠ” ì•¡ì…˜ ì‹¤í–‰í•œë‹¤ : í­íŒŒë˜ë©´ì„œ ìì—°ìŠ¤ëŸ½ê²Œ ì†Œë©¸ë˜ëŠ” ëª¨ì–‘ ì—°ì¶œ, 1 -> 0.3ìœ¼ë¡œ ì¤„ì–´ë“ ë‹¤.
+            yield return Util.Action2D.Scale(transform, Core.Constants.BLOCK_DESTROY_SCALE, 4f);
+
+            //2. í­íŒŒì‹œí‚¤ëŠ” íš¨ê³¼ ì—°ì¶œ : ë¸”ëŸ­ ìì²´ì˜ Clear íš¨ê³¼ë¥¼ ì—°ì¶œí•œë‹¤ (ëª¨ë“  ë¸”ëŸ­ ë™ì¼)
+            GameObject explosionObj = m_BlockConfig.GetExplosionObject(BlockQuestType.CLEAR_SIMPLE);
+            ParticleSystem.MainModule newModule = explosionObj.GetComponent<ParticleSystem>().main;
+            newModule.startColor = m_BlockConfig.GetBlockColor(m_Block.breed);
+
+            explosionObj.SetActive(true);
+            explosionObj.transform.position = this.transform.position;
+
+            yield return new WaitForSeconds(0.1f);
+
+            //3. ë¸”ëŸ­ GameObject ê°ì²´ ì‚­ì œ or make size zero
+            if (bDestroy)
+                Destroy(gameObject);
+            else
+            {
+                Debug.Assert(false, "Unknown Action : GameObject No Destory After Particle");
+            }
+        }
+
     }
 }

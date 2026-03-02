@@ -1,6 +1,8 @@
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace RoyalMatch.Util
+namespace Ninez.Util
 {
     public class TouchHandler : IInputHandlerBase
     {
@@ -10,4 +12,3 @@ namespace RoyalMatch.Util
         Vector2 IInputHandlerBase.inputPosition => Input.GetTouch(0).position;
     }
 }
-

@@ -1,8 +1,8 @@
-using RoyalMatch.Board;
-using System.Diagnostics;
+ï»¿using System;
+using UnityEngine;
+using Ninez.Board;
 
-//Stage °´Ã¼¸¦ »ı¼ºÇÏ°í, Board¸¦ ±¸¼ºÇÏ°í ÀÖ´Â Cell°ú Block  °ÔÀÓ¿ÀºêÁ§Æ®¸¦ »ı¼ºÇØ¼­ Board °ÔÀÓ¿ÀºêÁ§Æ®¿¡ Á¦°øÇÏ´Â ¿ªÇÒ
-namespace RoyalMatch.Stage
+namespace Ninez.Stage
 {
     public class StageBuilder
     {
@@ -15,20 +15,20 @@ namespace RoyalMatch.Stage
         }
 
         /// <summary>
-        /// ÁÖ¾îÁø Å©±âÀÇ Stage¸¦ »ı¼ºÇÏ°í,  Stage¸¦ ±¸¼ºÇÏ´Â º¸µåÀÇ Cell°ú BlockÀ» ±¸¼ºÇÑ´Ù
+        /// ì£¼ì–´ì§„ í¬ê¸°ì˜ Stageë¥¼ ìƒì„±í•˜ê³ ,  Stageë¥¼ êµ¬ì„±í•˜ëŠ” ë³´ë“œì˜ Cellê³¼ Blockì„ êµ¬ì„±í•œë‹¤
         /// </summary>
-        /// <returns>»ı¼ºµÈ Stage °´Ã¼</returns>
+        /// <returns>ìƒì„±ëœ Stage ê°ì²´</returns>
         public Stage ComposeStage()
         {
             Debug.Assert(m_nStage > 0, $"Invalide Stage : {m_nStage}");
 
-            //0. ½ºÅ×ÀÌÁö Á¤º¸¸¦ ·ÎµåÇÑ´Ù.(º¸µå Å©±â, Cell/ºí·° Á¤º¸ µî)
+            //0. ìŠ¤í…Œì´ì§€ ì •ë³´ë¥¼ ë¡œë“œí•œë‹¤.(ë³´ë“œ í¬ê¸°, Cell/ë¸”ëŸ­ ì •ë³´ ë“±)
             m_StageInfo = LoadStage(m_nStage);
 
-            //1. Stage °´Ã¼¸¦ »ı¼ºÇÑ´Ù.
+            //1. Stage ê°ì²´ë¥¼ ìƒì„±í•œë‹¤.
             Stage stage = new Stage(this, m_StageInfo.row, m_StageInfo.col);
 
-            //2. Cell,Block ÃÊ±â °ªÀ» »ı¼ºÇÑ´Ù.
+            //2. Cell,Block ì´ˆê¸° ê°’ì„ ìƒì„±í•œë‹¤.
             for (int nRow = 0; nRow < m_StageInfo.row; nRow++)
             {
                 for (int nCol = 0; nCol < m_StageInfo.col; nCol++)
@@ -42,25 +42,25 @@ namespace RoyalMatch.Stage
         }
 
         /// <summary>
-        /// ½ºÅ×ÀÌÁö ±¸¼ºÀ» À§ÇØ¼­ ±¸¼ºÁ¤º¸¸¦ ·ÎµåÇÑ´Ù. 
+        /// ìŠ¤í…Œì´ì§€ êµ¬ì„±ì„ ìœ„í•´ì„œ êµ¬ì„±ì •ë³´ë¥¼ ë¡œë“œí•œë‹¤. 
         /// </summary>
-        /// <param name="nStage">½ºÅ×ÀÌÁö ¹ø</param>
+        /// <param name="nStage">ìŠ¤í…Œì´ì§€ ë²ˆ</param>
         public StageInfo LoadStage(int nStage)
         {
             StageInfo stageInfo = StageReader.LoadStage(nStage);
             if (stageInfo != null)
             {
-                UnityEngine.Debug.Log(stageInfo.ToString());
+                Debug.Log(stageInfo.ToString());
             }
 
             return stageInfo;
         }
 
         /// <summary>
-        /// ÁöÁ¤µÈ À§Ä¡¿¡ ÀûÇÕÇÑ Block °´Ã¼¸¦ »ı¼ºÇÑ´Ù. 
+        /// ì§€ì •ëœ ìœ„ì¹˜ì— ì í•©í•œ Block ê°ì²´ë¥¼ ìƒì„±í•œë‹¤. 
         /// </summary>
-        /// <param name="nRow">Çà</param>
-        /// <param name="nCol">¿­</param>
+        /// <param name="nRow">í–‰</param>
+        /// <param name="nCol">ì—´</param>
         /// <returns></returns>
         Block SpawnBlockForStage(int nRow, int nCol)
         {
@@ -71,7 +71,7 @@ namespace RoyalMatch.Stage
         }
 
         /// <summary>
-        /// ÁöÁ¤µÈ À§Ä¡¿¡ ÀûÇÕÇÑ Cell °´Ã¼¸¦ »ı¼ºÇÑ´Ù.
+        /// ì§€ì •ëœ ìœ„ì¹˜ì— ì í•©í•œ Cell ê°ì²´ë¥¼ ìƒì„±í•œë‹¤.
         /// </summary>
         /// <param name="nRow"></param>
         /// <param name="nCol"></param>
@@ -85,7 +85,7 @@ namespace RoyalMatch.Stage
         }
 
         /// <summary>
-        /// ÁÖ¾îÁø Á¤º¸¸¦ ÀÌ¿ëÇØ¼­ StageBuilder¸¦ »ı¼ºÇÏ°í, º¸µå Å©±â¿¡ ÇØ´çÇÏ´Â Stage¸¦ »ı¼ºÇÑ´Ù.
+        /// ì£¼ì–´ì§„ ì •ë³´ë¥¼ ì´ìš©í•´ì„œ StageBuilderë¥¼ ìƒì„±í•˜ê³ , ë³´ë“œ í¬ê¸°ì— í•´ë‹¹í•˜ëŠ” Stageë¥¼ ìƒì„±í•œë‹¤.
         /// </summary>
         /// <param name="nStage"></param>
         /// <param name="row"></param>
@@ -100,18 +100,18 @@ namespace RoyalMatch.Stage
         }
 
         /// <summary>
-        /// ±âº»Çü ºí·°À» ¿äÃ»ÇÑ´Ù.
+        /// ê¸°ë³¸í˜• ë¸”ëŸ­ì„ ìš”ì²­í•œë‹¤.
         /// </summary>
-        /// <returns>»ı¼ºµÈ Block °´Ã¼</returns>
+        /// <returns>ìƒì„±ëœ Block ê°ì²´</returns>
         public Block SpawnBlock()
         {
             return BlockFactory.SpawnBlock(BlockType.BASIC);
         }
-
+        
         /// <summary>
-        /// BlockType.EMPTYÀÎ ºí·°À» ¿äÃ»ÇÑ´Ù
+        /// BlockType.EMPTYì¸ ë¸”ëŸ­ì„ ìš”ì²­í•œë‹¤
         /// </summary>
-        /// <returns>»ı¼ºµÈ Block °´Ã¼</returns>
+        /// <returns>ìƒì„±ëœ Block ê°ì²´</returns>
         public Block SpawnEmptyBlock()
         {
             Block newBlock = BlockFactory.SpawnBlock(BlockType.EMPTY);
@@ -120,17 +120,3 @@ namespace RoyalMatch.Stage
         }
     }
 }
-
-/*
- * 1. static ¸Ş¼Òµå BuildStage È£Ãâ, Stage °´Ã¼¸¦ ¸®ÅÏ  
- * 2. StageBuilder °´Ã¼ ÀÎ½ºÅÏ½º¸¦ »ı¼º   new StageBuilder
- * 3. Stage Á¤º¸¸¦ ±¸¼ºÇÏ´Â ComposeStage ÇÔ¼ö È£Ãâ
- * 4. Stage °´Ã¼ ÀÎ½ºÅÏ½º »ı¼º
- * 5. Stage¿¡¼­ Board °´Ã¼¸¦ »ı¼º, Board¸¦ ±¸¼ºÇÏ´Â Cell°ú BlockÀ» ÀúÀåÇÒ ¼ö ÀÖ´Â ¹è¿­À» °¢°¢ »ı¼º
- * 6. º¸µå¸¦ ±¸¼ºÇÏ´Â ¸ğµç Çà°ú ¿­¿¡ ´ëÇØ¼­ Block °´Ã¼¸¦ ¿äÃ»
- * 7. Block °´Ã¼ »ı¼º
- * 8. º¸µå¸¦ ±¸¼ºÇÏ´Â ¸ğµç Çà°ú ¿­¿¡ ´ëÇØ¼­ Cell °´Ã¼¸¦ ¿äÃ»
- * 9. Cell °´Ã¼ »ı¼º
- * 
- * StageBuilder¿¡°Ô Stage±¸¼ºÀ» ¿äÃ»ÇÏ¸é, Stage°´Ã¼¸¦ »ı¼ºÇÑ ÈÄ, Stage¸¦ ±¸¼ºÇÏ´Â Board¸¦ ±¸¼ºÇÏ´Â Èå¸§ÀÌ´Ù.
- */

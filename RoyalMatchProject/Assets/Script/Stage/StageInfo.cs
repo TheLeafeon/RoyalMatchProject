@@ -1,16 +1,14 @@
-using RoyalMatch.Board;
+ï»¿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-/*
- * À¯´ÏÆ¼¿¡¼­ Á¦°øÇÏ´Â JsonUtility¸¦ »ç¿ëÇÏ¿© JSON ÆÄÀÏÀ» ÀĞ¾î¼­ Object·Î º¯È¯ÇÑ´Ù.
- * º¯È¯µÇ´Â Object´Â JSON to Object º¯È¯ÀÌ Àû¿ëµÇµµ·Ï SerializableÇÑ °´Ã¼·Î ¼±¾ğµÇ¾î¾ß ÇÑ´Ù.
- * 
- */
-namespace RoyalMatch.Stage
+using Ninez.Board;
+
+namespace Ninez.Stage
 {
     /// <summary>
-    /// stage ÆÄÀÏ¿¡¼­ ÀĞ¾î¿Â Á¤º¸ (½ºÅ×ÀÌÁö ±¸¼º¿¡ »ç¿ë) 
-    /// Note : ¸â¹ö ³×ÀÌ¹ÖÀº m_ ºÙÀÌÁö ¾Ê´Â´Ù.
-    /// JSON ÆÄÀÏÀ» serializeÇÏ´Â °æ¿ì json Å° °ª°ú º¯¼ö ÀÌ¸§ÀÌ ÀÏÄ¡ÇØ¾ß µÈ´Ù.
+    /// stage íŒŒì¼ì—ì„œ ì½ì–´ì˜¨ ì •ë³´ (ìŠ¤í…Œì´ì§€ êµ¬ì„±ì— ì‚¬ìš©) 
+    /// Note : ë©¤ë²„ ë„¤ì´ë°ì€ m_ ë¶™ì´ì§€ ì•ŠëŠ”ë‹¤.
+    /// JSON íŒŒì¼ì„ serializeí•˜ëŠ” ê²½ìš° json í‚¤ ê°’ê³¼ ë³€ìˆ˜ ì´ë¦„ì´ ì¼ì¹˜í•´ì•¼ ëœë‹¤.
     /// </summary>
     [System.Serializable]
     public class StageInfo
@@ -26,10 +24,10 @@ namespace RoyalMatch.Stage
         }
 
         /// <summary>
-        /// ÁöÁ¤µÈ À§Ä¡ÀÇ Cell TypeÀ» ±¸ÇÑ´Ù
+        /// ì§€ì •ëœ ìœ„ì¹˜ì˜ Cell Typeì„ êµ¬í•œë‹¤
         /// </summary>
-        /// <param name="nRow">Çà</param>
-        /// <param name="nCol">¿­</param>
+        /// <param name="nRow">í–‰</param>
+        /// <param name="nCol">ì—´</param>
         /// <returns></returns>
         public CellType GetCellType(int nRow, int nCol)
         {
@@ -48,9 +46,9 @@ namespace RoyalMatch.Stage
         }
 
         /// <summary>
-        /// »ı¼ºµÈ Á¤º¸°¡ À¯È¿ÇÑÁö °Ë»çÇÑ´Ù 
+        /// ìƒì„±ëœ ì •ë³´ê°€ ìœ íš¨í•œì§€ ê²€ì‚¬í•œë‹¤ 
         /// </summary>
-        /// <returns>À¯È¿ÇÏ¸é ture, ±×·¸Áö ¾ÊÀ¸¸é false</returns>
+        /// <returns>ìœ íš¨í•˜ë©´ ture, ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ false</returns>
         public bool DoValidation()
         {
             Debug.Assert(cells.Length == row * col);

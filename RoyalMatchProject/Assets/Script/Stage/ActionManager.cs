@@ -1,20 +1,20 @@
+ï»¿using System.Collections;
+using System.Collections.Generic;
+using Ninez.Util;
 using UnityEngine;
-using System.Collections;
-using RoyalMatch.Util;
 
-namespace RoyalMatch.Stage
+namespace Ninez.Stage
 {
-    //ÄÚ·çÆ¾À» ÀÌ¿ëÇÑ ÇÃ·¹ÀÌ ¾×¼ÇÀ» ÃÑ°ıÇÏ´Â Å¬·¡½º
-    //ActionManage´Â ¾×¼ÇÀÇ Èå¸§À» °ü¸®ÇÏ°í ½ÇÁ¦ ¾×¼ÇÀº ¾×¼ÇÀÇ ´ë»ó¿¡°Ô À§ÀÓ
-    //ºí·°À» ÀÌµ¿ÇÏ´Â ¾×¼ÇÀÌ ÇÊ¿äÇÑ °æ¿ì¿¡ ºí·° ·¹ÆÛ·±½º¸¦ Á÷Á¢ ±¸ÇØ¼­ ¾×¼ÇÀ» ½ÇÇàÇÏÁö ¾Ê°í, ºí·°À» °ü¸®ÇÏ°í ÀÖ´Â ´ë»ó¿¡°Ô ¾×¼ÇÀ» ¿äÃ»ÇÏ´Â ½Ä
-    //ºí·°ÀÌ¶ó´Â Á¸Àç°¡ ÀÖ´ÂÁö Á¶Â÷ ¾ËÁö ¸øÇÑ´Ù.  ´ÜÁö ¾×¼ÇÀÌ ÇÊ¿äÇÏ´Ù ¿äÃ»À» ¹ŞÀ¸¸é ±× ´ë»ó¿¡°Ô ÇÊ¿äÇÑ ¾×¼ÇÀ» ¼öÇàÇÏ¶ó°í ¿äÃ»ÇÒ »ÓÀÌ´Ù.
-    //¿äÃ»ÇÑ ¾×¼ÇÀÌ Á¾·á µÇ¾ú´ÂÁö È®ÀÎÇÑ´Ù.
-    public class ActionManager
+    /**
+     * í”Œë ˆì´ì–´ì˜ ì•¡ì…˜ì„ ì²˜ë¦¬í•˜ëŠ” í´ë˜ìŠ¤
+     */
+    public class ActionManager 
     {
-        Transform m_Container; // Board GameObject
-        Stage m_Stage;
-        MonoBehaviour m_MonoBehaviour; //ÄÚ·çÆ¾ È£Ãâ ½Ã ÇÊ¿äÇÑ monobehaviour
-        bool m_bRunning; //¾×¼Ç ½ÇÇà»óÅÂ È®ÀÎ¿ë bool ¾×¼ÇÁßÀÌ¶ó¸é true
+        Transform m_Container;          //ì»¨í…Œì´ì € (Board GameObject)
+        Stage m_Stage;                  
+        MonoBehaviour m_MonoBehaviour;  //ì½”ë£¨í‹´ í˜¸ì¶œì‹œ í•„ìš”í•œ MonoBehaviour
+
+        bool m_bRunning;                //ì•¡ì…˜ ì‹¤í–‰ ìƒíƒœ : ì‹¤í–‰ì¤‘ì¸ ê²½ìš° true
 
         public ActionManager(Transform container, Stage stage)
         {
@@ -24,40 +24,89 @@ namespace RoyalMatch.Stage
             m_MonoBehaviour = container.gameObject.GetComponent<MonoBehaviour>();
         }
 
-        //ÄÚ·çÆ¾À» ¼öÇàÇÏ´Â StartCoroutine()ÀÇ Wrapper ¸Ş¼Òµå.
-        //
+        /*
+         * ì½”ë£¨í‹´ Wapper ë©”ì†Œë“œ   
+         */
         public Coroutine StartCoroutine(IEnumerator routine)
         {
             return m_MonoBehaviour.StartCoroutine(routine);
         }
 
-        //½º¿ÍÀÌÇÁ ¾×¼Ç ¼öÇàÀ» ¿äÃ» ¹Ş´Â ¸Ş¼Òµå
+        /*
+         * ìŠ¤ì™€ì´í”„ë¥¼ ì•¡ì…˜ì„ ì‹œì‘í•œë‹¤.
+         * @param nRow, nCol ë¸”ëŸ­ ìœ„ì¹˜
+         * @swipeDir ìŠ¤ì™€ì´í”„ ë°©í–¥
+         */
         public void DoSwipeAction(int nRow, int nCol, Swipe swipeDir)
         {
-            //½º¿ÍÀÌÇÁ Å¬¸¯ÇÑ°Ô ½ÇÁ¦·Î ½º¿ÍÀÌÇÁ °¡´ÉÇÑ ºí·°ÀÌ¶ó¸é, 
-            Debug.Assert(nRow >=0 && nRow < m_Stage.maxRow && nCol >=0 && nCol < m_Stage.maxCol);
+            Debug.Assert(nRow >= 0 && nRow < m_Stage.maxRow && nCol >= 0 && nCol < m_Stage.maxCol);
 
-            //Á¶°Ç ÃæÁ·, ½º¿ÍÀÌÇÁ °¡´ÉÇÏ´Ù¸é
-            if(m_Stage.IsValideSwipe(nRow, nCol, swipeDir))
+            if (m_Stage.IsValideSwipe(nRow, nCol, swipeDir))
             {
                 StartCoroutine(CoDoSwipeAction(nRow, nCol, swipeDir));
             }
         }
 
-        //½º¿ÍÀÌÇÁ ¾×¼ÇÀ» ¼öÇàÇÏ´Â ÄÚ·çÆ¾, Stage °´Ã¼¿¡°Ô ½º¿ÍÀÌÇÁ ¾×¼ÇÀ» À§ÀÓ
+        /*
+         * ìŠ¤ì™€ì´í”„ ì•¡ì…˜ì„ ìˆ˜í–‰í•˜ëŠ” ì½”ë£¨í‹´
+         */
         IEnumerator CoDoSwipeAction(int nRow, int nCol, Swipe swipeDir)
         {
-            if(!m_bRunning)
+            if (!m_bRunning)  //ë‹¤ë¥¸ ì•¡ì…˜ì´ ìˆ˜í–‰ ì¤‘ì´ë©´ PASS
             {
-                m_bRunning = true;
+                m_bRunning = true;    //ì•¡ì…˜ ì‹¤í–‰ ìƒíƒœ ON
 
-                //ÄÚ·çÆ¾ ½ÇÇà °á°ú¸¦ Àü´Ş¹ŞÀ» Returnable °´Ã¼¸¦ »ı¼º
-                //ÄÚ·çÆ¾Àº IEnumerator¸¦ ¸®ÅÏÇÒ »Ó ÄÚ·çÆ¾ ¼öÇà °á°ú°ªÀ» ¸®ÅÏÇØÁÖÁö ¾Ê´Â´Ù. ±×·¡¼­ Returanable °´Ã¼¸¦ ÀÎÀÚ·Î Àü´ŞÇÑ´Ù.
+                SoundManager.instance.PlayOneShot(Clip.Chomp);
+
+                //1. swipe action ìˆ˜í–‰
                 Returnable<bool> bSwipedBlock = new Returnable<bool>(false);
-                //Stage °´Ã¼ÀÇ ÄÚ·çÆ¾ CoDoSwipeAction()À» ½ÇÇàÇÏ°í, ÄÚ·çÆ¾ÀÌ Á¾·áµÉ ¶§±îÁö ±â´Ù¸°´Ù.
-                yield return m_Stage.CoDoSwipeAction(nRow, nCol,swipeDir ,bSwipedBlock);
+                yield return m_Stage.CoDoSwipeAction(nRow, nCol, swipeDir, bSwipedBlock);
 
-                m_bRunning = false;
+                //2. ìŠ¤ì™€ì´í”„ ì„±ê³µí•œ ê²½ìš° ë¸Œë“œë¥¼ í‰ê°€(ë§¤ì¹˜ë¸”ëŸ­ì‚­ì œ, ë¹ˆë¸”ëŸ­ ë“œë¡­, ìƒˆë¸”ëŸ­ Spawn ë“±)í•œë‹¤.
+                if (bSwipedBlock.value)
+                {
+                    Returnable<bool> bMatchBlock = new Returnable<bool>(false);
+                    yield return EvaluateBoard(bMatchBlock);
+
+                    //ìŠ¤ì™€ì´í”„í•œ ë¸”ëŸ­ì´ ë§¤ì¹˜ë˜ì§€ ì•Šì€ ê²½ìš°ì— ì›ìƒíƒœ ë³µê·€
+                    if (!bMatchBlock.value)
+                    {
+                        yield return m_Stage.CoDoSwipeAction(nRow, nCol, swipeDir, bSwipedBlock);
+                    }
+                }
+
+                m_bRunning = false;  //ì•¡ì…˜ ì‹¤í–‰ ìƒíƒœ OFF
+            }
+            yield break;
+        }
+
+        /*
+         * í˜„ìƒíƒœì—ì„œ ë³´ë“œë¥¼ í‰ê°€í•œë‹¤. ì¦‰ ë³´ë“œë¥¼ êµ¬ì„±í•˜ëŠ” ë¸”ëŸ­ì— ê²Œì„ê·œì¹™ì„ ì ìš©ì‹œí‚¨ë‹¤.
+         * ë§¤ì¹˜ëœ ë¸”ëŸ­ì€ ì œê±°í•˜ê³  ë¹ˆìë¦¬ì—ëŠ” ìƒˆë¡œìš´ ë¸”ëŸ­ì„ ìƒì„±í•œë‹¤.    
+         * matchResult : ì‹¤í–‰ ê²°ê³¼ë¥¼ ë¦¬í„´ë°›ì€ í´ë˜ìŠ¤ 
+         *               true : ë§¤ì¹˜ëœ ë¸”ëŸ­ ìˆëŠ” ê²½ìš°, false : ì—†ëŠ” ê²½ìš°
+         */
+        IEnumerator EvaluateBoard(Returnable<bool> matchResult)
+        {
+            while (true)    //ë§¤ì¹­ëœ ë¸”ëŸ­ì´ ìˆëŠ” ê²½ìš° ë°˜ë³µ ìˆ˜í–‰í•œë‹¤.
+            {
+                //1. ë§¤ì¹˜ ë¸”ëŸ­ ì œê±°
+                Returnable<bool> bBlockMatched = new Returnable<bool>(false);
+                yield return StartCoroutine(m_Stage.Evaluate(bBlockMatched));
+
+                //2. 3ë§¤ì¹˜ ë¸”ëŸ­ì´ ìˆëŠ” ê²½ìš° í›„ì²˜ë¦¬ ì‹±í–‰ (ë¸”ëŸ­ ë“œë¡­ ë“±)
+                if (bBlockMatched.value)
+                {
+                    matchResult.value = true;
+
+                    SoundManager.instance.PlayOneShot(Clip.BlcokClear);
+
+                    // ë§¤ì¹­ ë¸”ëŸ­ ì œê±° í›„ ë¹ˆë¸”ëŸ­ ë“œë¡­ í›„ ìƒˆ ë¸”ëŸ­ ìƒì„±
+                    yield return StartCoroutine(m_Stage.PostprocessAfterEvaluate());
+                }
+                //3. 3ë§¤ì¹˜ ë¸”ëŸ­ì´ ì—†ëŠ” ê²½ìš° while ë¬¸ ì¢…ë£Œ
+                else
+                    break;  
             }
 
             yield break;
@@ -65,4 +114,3 @@ namespace RoyalMatch.Stage
 
     }
 }
-

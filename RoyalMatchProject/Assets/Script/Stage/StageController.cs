@@ -1,12 +1,9 @@
-using RoyalMatch.Util;
+ï»¿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using Ninez.Util;
 
-/*
- * Stage °´Ã¼ ÂüÁ¶¸¦ ¼±¾ğÇÏ°í,
- * Start() ÇÔ¼ö¿¡¼­ ÃÊ±âÈ­ ¸Ş¼Òµå InitStage()¸¦ È£ÃâÇÑ´Ù.
- * 
- */
-namespace RoyalMatch.Stage
+namespace Ninez.Stage
 {
     public class StageController : MonoBehaviour
     {
@@ -16,9 +13,9 @@ namespace RoyalMatch.Stage
         ActionManager m_ActionManager;
 
         //Event Members
-        bool m_bTouchDown;          //ÀÔ·Â»óÅÂ Ã³¸® ÇÃ·¡±×, À¯È¿ÇÑ ºí·°À» Å¬¸¯ÇÑ °æ¿ì true
-        BlockPos m_BlockDownPos;    //ºí·° ÀÎµ¦½º (º¸µå¿¡ ÀúÀåµÈ À§Ä¡)
-        Vector3 m_ClickPos;         //DOWN À§Ä¡(º¸µå ±âÁØ Local ÁÂÇ¥)
+        bool m_bTouchDown;          //ì…ë ¥ìƒíƒœ ì²˜ë¦¬ í”Œë˜ê·¸, ìœ íš¨í•œ ë¸”ëŸ­ì„ í´ë¦­í•œ ê²½ìš° true
+        BlockPos m_BlockDownPos;    //ë¸”ëŸ­ ì¸ë±ìŠ¤ (ë³´ë“œì— ì €ì¥ëœ ìœ„ì¹˜)
+        Vector3 m_ClickPos;         //DOWN ìœ„ì¹˜(ë³´ë“œ ê¸°ì¤€ Local ì¢Œí‘œ)
 
         [SerializeField] Transform m_Container;
         [SerializeField] GameObject m_CellPrefab;
@@ -51,16 +48,16 @@ namespace RoyalMatch.Stage
         }
 
         /*
-         * ½ºÅ×ÀÌÁö¸¦ ±¸¼ºÇÑ´Ù.
-         * Stage °´Ã¼¸¦ ÇÒ´ç¹Ş°í, Stage ±¸¼ºÀ» ¿äÃ»ÇÑ´Ù.
+         * ìŠ¤í…Œì´ì§€ë¥¼ êµ¬ì„±í•œë‹¤.
+         * Stage ê°ì²´ë¥¼ í• ë‹¹ë°›ê³ , Stage êµ¬ì„±ì„ ìš”ì²­í•œë‹¤.
          */
         void BuildStage()
         {
-            //1. Stage¸¦ ±¸¼ºÇÑ´Ù.
-            m_Stage = StageBuilder.BuildStage(nStage: 2);
+            //1. Stageë¥¼ êµ¬ì„±í•œë‹¤.
+            m_Stage = StageBuilder.BuildStage(nStage : 1);
             m_ActionManager = new ActionManager(m_Container, m_Stage);
 
-            //2. »ı¼ºÇÑ stage Á¤º¸¸¦ ÀÌ¿ëÇÏ¿© ¾ÀÀ» ±¸¼ºÇÑ.
+            //2. ìƒì„±í•œ stage ì •ë³´ë¥¼ ì´ìš©í•˜ì—¬ ì”¬ì„ êµ¬ì„±í•œ.
             m_Stage.ComposeStage(m_CellPrefab, m_BlockPrefab, m_Container);
         }
 
@@ -69,39 +66,39 @@ namespace RoyalMatch.Stage
             //1. Touch Down 
             if (!m_bTouchDown && m_InputManager.isTouchDown)
             {
-                //1.1 º¸µå ±âÁØ Local ÁÂÇ¥¸¦ ±¸ÇÑ´Ù.
+                //1.1 ë³´ë“œ ê¸°ì¤€ Local ì¢Œí‘œë¥¼ êµ¬í•œë‹¤.
                 Vector2 point = m_InputManager.touch2BoardPosition;
 
-                //1.2 Play ¿µ¿ª(º¸µå)¿¡¼­ Å¬¸¯ÇÏÁö ¾Ê´Â °æ¿ì´Â ¹«½Ã
+                //1.2 Play ì˜ì—­(ë³´ë“œ)ì—ì„œ í´ë¦­í•˜ì§€ ì•ŠëŠ” ê²½ìš°ëŠ” ë¬´ì‹œ
                 if (!m_Stage.IsInsideBoard(point))
                     return;
 
-                //1.3 Å¬¸¯ÇÑ À§Ä¡ÀÌ ºí·°À» ±¸ÇÑ´Ù.
+                //1.3 í´ë¦­í•œ ìœ„ì¹˜ì´ ë¸”ëŸ­ì„ êµ¬í•œë‹¤.
                 BlockPos blockPos;
                 if (m_Stage.IsOnValideBlock(point, out blockPos))
                 {
-                    //1.3.1 À¯È¿ÇÑ(½º¿ÍÀÌÇÁ °¡´ÉÇÑ) ºí·°¿¡¼­ Å¬¸¯ÇÑ °æ¿ì
-                    m_bTouchDown = true;        //Å¬¸¯ »óÅÂ ÇÃ·¡±× ON
-                    m_BlockDownPos = blockPos;  //Å¬¸¯ÇÑ ºí·°ÀÇ À§Ä¡(row, col) ÀúÀå
-                    m_ClickPos = point;         //Å¬¸¯ÇÑ Local ÁÂÇ¥ ÀúÀå
+                    //1.3.1 ìœ íš¨í•œ(ìŠ¤ì™€ì´í”„ ê°€ëŠ¥í•œ) ë¸”ëŸ­ì—ì„œ í´ë¦­í•œ ê²½ìš°
+                    m_bTouchDown = true;        //í´ë¦­ ìƒíƒœ í”Œë˜ê·¸ ON
+                    m_BlockDownPos = blockPos;  //í´ë¦­í•œ ë¸”ëŸ­ì˜ ìœ„ì¹˜(row, col) ì €ì¥
+                    m_ClickPos = point;         //í´ë¦­í•œ Local ì¢Œí‘œ ì €ì¥
                     //Debug.Log($"Mouse Down In Board : (blockPos})");
                 }
             }
-            //2. Touch UP : À¯È¿ÇÑ ºí·° À§¿¡¼­ Down ÈÄ¿¡¸¸ UP ÀÌº¥Æ® Ã³¸®
+            //2. Touch UP : ìœ íš¨í•œ ë¸”ëŸ­ ìœ„ì—ì„œ Down í›„ì—ë§Œ UP ì´ë²¤íŠ¸ ì²˜ë¦¬
             else if (m_bTouchDown && m_InputManager.isTouchUp)
             {
-                //2.1 º¸µå ±âÁØ Local ÁÂÇ¥¸¦ ±¸ÇÑ´Ù.
+                //2.1 ë³´ë“œ ê¸°ì¤€ Local ì¢Œí‘œë¥¼ êµ¬í•œë‹¤.
                 Vector2 point = m_InputManager.touch2BoardPosition;
 
-                //2.2 ½º¿ÍÀÌÇÁ ¹æÇâÀ» ±¸ÇÑ´Ù.
+                //2.2 ìŠ¤ì™€ì´í”„ ë°©í–¥ì„ êµ¬í•œë‹¤.
                 Swipe swipeDir = m_InputManager.EvalSwipeDir(m_ClickPos, point);
 
-                Debug.Log($"Swipe : {swipeDir} , Block = {m_BlockDownPos}");
+                //Debug.Log($"Swipe : {swipeDir} , Block = {m_BlockDownPos}");
 
-                if(swipeDir != Swipe.NA)
-                    m_ActionManager.DoSwipeAction(m_BlockDownPos.row, m_BlockDownPos.col , swipeDir);
+                if (swipeDir != Swipe.NA)
+                    m_ActionManager.DoSwipeAction(m_BlockDownPos.row, m_BlockDownPos.col, swipeDir);
 
-                m_bTouchDown = false;   //Å¬¸¯ »óÅÂ ÇÃ·¡±× OFF
+                m_bTouchDown = false;   //í´ë¦­ ìƒíƒœ í”Œë˜ê·¸ OFF
             }
         }
     }

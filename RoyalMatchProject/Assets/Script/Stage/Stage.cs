@@ -1,18 +1,20 @@
-using RoyalMatch.Board;
+ï»¿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using RoyalMatch.Util;
-using RoyalMatch.Core;
-using System.Collections;
+using Ninez.Board;
+using Ninez.Util;
+using Ninez.Core;
+using System;
 
-namespace RoyalMatch.Stage
+namespace Ninez.Stage
 {
     public class Stage
     {
         public int maxRow { get { return m_Board.maxRow; } }
         public int maxCol { get { return m_Board.maxCol; } }
 
-        RoyalMatch.Board.Board m_Board;
-        public RoyalMatch.Board.Board board { get { return m_Board; } }
+        Ninez.Board.Board m_Board;
+        public Ninez.Board.Board board { get { return m_Board; } }
 
         StageBuilder m_StageBuilder;
 
@@ -20,8 +22,8 @@ namespace RoyalMatch.Stage
         public Cell[,] cells { get { return m_Board.cells; } }
 
         /// <summary>
-        /// »ı¼ºÀÚ.
-        /// ÁÖ¾îÁø Å©±â¸¦ °®´Â Board¸¦ »ı¼ºÇÑ´Ù.
+        /// ìƒì„±ì.
+        /// ì£¼ì–´ì§„ í¬ê¸°ë¥¼ ê°–ëŠ” Boardë¥¼ ìƒì„±í•œë‹¤.
         /// </summary>
         /// <param name="stageBuilder"></param>
         /// <param name="nRow"></param>
@@ -30,30 +32,144 @@ namespace RoyalMatch.Stage
         {
             m_StageBuilder = stageBuilder;
 
-            m_Board = new RoyalMatch.Board.Board(nRow, nCol);
+            m_Board = new Ninez.Board.Board(nRow, nCol);
         }
 
-        /// ÁÖ¾îÁø Á¤º¸(Cell/Block Prefab, ÄÁÅ×ÀÌ³Ê)¸¦ ÀÌ¿ëÇØ¼­ Board¸¦ ±¸¼ºÇÑ´Ù.
+        /// <summary>
+        /// ì£¼ì–´ì§„ ì •ë³´(Cell/Block Prefab, ì»¨í…Œì´ë„ˆ)ë¥¼ ì´ìš©í•´ì„œ Boardë¥¼ êµ¬ì„±í•œë‹¤.
+        /// </summary>
         /// <param name="cellPrefab">Cell Prefab</param>
         /// <param name="blockPrefab">Board Prefab</param>
-        /// <param name="container">Cell/Board GameObjectÀÇ ºÎ¸ğ GameObject</param>
+        /// <param name="container">Cell/Board GameObjectì˜ ë¶€ëª¨ GameObject</param>
         internal void ComposeStage(GameObject cellPrefab, GameObject blockPrefab, Transform container)
         {
-            m_Board.ComposeStage(cellPrefab, blockPrefab, container);
+            m_Board.ComposeStage(cellPrefab, blockPrefab, container, m_StageBuilder);
+        }
+
+        /*
+         * ìœ íš¨í•œ ìŠ¤ì™€ì´í”„ì¸ ê²½ìš° : ìŠ¤ì™€ì´í”„ ë°©í–¥ìœ¼ë¡œ ë¸”ëŸ­ ìœ„ì¹˜ê°€ êµì²´ëœë‹¤.
+         * ìœ íš¨ì§€ ì•ŠëŠ” ìŠ¤ì™€ì´í”„ ê²½ìš° : í™”ë©´ì— ìŠ¤ì™€ì´í”„ ë°©í–¥ìœ¼ë¡œ ì•¡ì…˜ì„ ë³´ì—¬ì£¼ê³ , ì›ìƒíƒœë¡œ ë³µêµ¬í•˜ëŠ” ì•¡ì…˜ ë³´ì—¬ì¤€ë‹¤
+         */
+        public IEnumerator CoDoSwipeAction(int nRow, int nCol, Swipe swipeDir, Returnable<bool> actionResult)
+        {
+            actionResult.value = false; //ì½”ë£¨í‹´ ë¦¬í„´ê°’ RESET
+
+            //1. ìŠ¤ì™€ì´í”„ë˜ëŠ” ìƒëŒ€ ë¸”ëŸ­ ìœ„ì¹˜ë¥¼ êµ¬í•œë‹¤. (using SwipeDir Extension Method)
+            int nSwipeRow = nRow, nSwipeCol = nCol;
+            nSwipeRow += swipeDir.GetTargetRow(); //Right : +1, LEFT : -1
+            nSwipeCol += swipeDir.GetTargetCol(); //UP : +1, DOWN : -1
+
+            Debug.Assert(nRow != nSwipeRow || nCol != nSwipeCol, "Invalid Swipe : ({nSwipeRow}, {nSwipeCol})");
+            Debug.Assert(nSwipeRow >= 0 && nSwipeRow < maxRow && nSwipeCol >= 0 && nSwipeCol < maxCol, $"Swipe íƒ€ê²Ÿ ë¸”ëŸ­ ì¸ë±ìŠ¤ ì˜¤ë¥˜ = ({nSwipeRow}, {nSwipeCol}) ");
+
+            //2. ìŠ¤ì™€ì´í”„ ê°€ëŠ¥í•œ ë¸”ëŸ­ì¸ì§€ ì²´í¬í•œë‹¤. (ì¸ë±ìŠ¤ Validationì€ í˜¸ì¶œ ì „ì— ê²€ì¦ë¨)
+            if (m_Board.IsSwipeable(nSwipeRow, nSwipeCol))
+            {
+                //2.1 ìŠ¤ì™€ì´í”„ ëŒ€ìƒ ë¸”ëŸ­(ì†ŒìŠ¤, íƒ€ê²Ÿ)ê³¼ ê° ë¸”ëŸ­ì˜ ì´ë™ì „ ìœ„ì¹˜ë¥¼ ì €ì¥í•œë‹¤.
+                Block targetBlock = blocks[nSwipeRow, nSwipeCol];
+                Block baseBlock = blocks[nRow, nCol];
+                Debug.Assert(baseBlock != null && targetBlock != null);
+
+                Vector3 basePos = baseBlock.blockObj.transform.position;
+                Vector3 targetPos = targetBlock.blockObj.transform.position;
+
+                //2.2 ìŠ¤ì™€ì´í”„ ì•¡ì…˜ì„ ì‹¤í–‰í•œë‹¤.
+                if (targetBlock.IsSwipeable(baseBlock))
+                {
+                    //2.2.1 ìƒëŒ€ë°©ì˜ ë¸”ëŸ­ ìœ„ì¹˜ë¡œ ì´ë™í•˜ëŠ” ì• ë‹ˆë©”ì´ì…˜ì„ ìˆ˜í–‰í•œë‹¤
+                    baseBlock.MoveTo(targetPos, Constants.SWIPE_DURATION);
+                    targetBlock.MoveTo(basePos, Constants.SWIPE_DURATION);
+
+                    yield return new WaitForSeconds(Constants.SWIPE_DURATION);
+
+                    //2.2.2 Boardì— ì €ì¥ëœ ë¸”ëŸ­ì˜ ìœ„ì¹˜ë¥¼ êµí™˜í•œë‹¤
+                    blocks[nRow, nCol] = targetBlock;
+                    blocks[nSwipeRow, nSwipeCol] = baseBlock;
+
+                    actionResult.value = true;
+                }
+            }
+
+            yield break;
+        }
+
+        /*
+         * ìŠ¤í…Œì´ì§€ë¥¼ êµ¬ì„±í•˜ëŠ” ì „ì²´ ë³´ë“œë¥¼ í‰ê°€í•œë‹¤.   
+         * ê° ë¸”ëŸ­ì— ì§€ì •ëœ ìƒíƒœ/ì¢…ë¥˜/ì¹´ìš´í„° ë“±ì— ë”°ë¼ì„œ ë¸”ëŸ­ì˜ ë‹¤ìŒ ìƒíƒœë¥¼ ë³€ê²½í•œë‹¤.
+         * ex) Matchëœ ë¸”ëŸ­ì€ ì œê±°ë˜ê³  ì¹´ìš´í„°ê°€ ìˆëŠ” ê²½ìš° í•´ë‹¹ë˜ëŠ” ê²½ìš°ë§Œí¼ ê°ì†Œí•˜ëŠ” ë“±
+         * 
+         * í˜¸ì¶œëœ í›„ì˜ ìƒíƒœ : Block ê°ì²´ ì œê±°, Block GameObject ì œê±°
+         * 
+         * @return ë§¤ì¹˜ëœ ë¸”ëŸ­ì´ ìˆëŠ” ê²½ìš° true, ì—†ìœ¼ë©´ false
+         */
+        public IEnumerator Evaluate(Returnable<bool> matchResult)
+        {
+            yield return m_Board.Evaluate(matchResult);
+        }
+
+        /*
+         * ë§¤ì¹­ëœ ë¸”ëŸ­ì„ ì œê±°í•œ í›„ì˜ í›„ì²˜ë¦¬ ë¡œì§ì„ ë‹´ë‹¹í•œë‹¤
+         * ë¹ˆ ë¸”ëŸ­ì— ìƒìœ„ ë¸”ëŸ­ì„ Dropí•´ì„œ ì±„ìš´ í›„ì— ìƒˆë¡œìš´ ë¸”ëŸ­ìœ¼ë¡œ ë¹ˆìë¦¬ë¥¼ ì±„ìš´ë‹¤        
+         */
+        public IEnumerator PostprocessAfterEvaluate()
+        {
+            List<KeyValuePair<int, int>> unfilledBlocks = new List<KeyValuePair<int, int>>();
+            List<Block> movingBlocks = new List<Block>();
+
+            //1. ì œê±°ëœ ë¸”ëŸ­ì— ë”°ë¼, ë¸”ëŸ­ ì¬ë°°ì¹˜(ìƒìœ„ -> í•˜ìœ„ ì´ë™/ì• ë‹ˆë©”ì´ì…˜)
+            yield return m_Board.ArrangeBlocksAfterClean(unfilledBlocks, movingBlocks);
+
+            //2. ì¬ë°°ì¹˜ ì™„ë£Œ(ì´ë™ ì• ë‹ˆë©”ì´ì…˜ ì™„ë£Œ)í›„, ë¹„ì–´ìˆëŠ” ë¸”ëŸ­ ë‹¤ì‹œ ìƒì„±
+            yield return m_Board.SpawnBlocksAfterClean(movingBlocks);
+
+            //3. ë¸”ëŸ­ ì¬ìƒì„± í›„, ë§¤ì¹˜ë¸”ëŸ­ ì œê±°í•˜ê¸° ìœ„í•œ ë£¨í”„ë¥¼ ëŒë•Œ
+            //   ìœ ì €ì—ê²Œ ìƒì„±ëœ ë¸”ëŸ­ì´ ì ì‹œë™ì•ˆ ë³´ì´ë„ë¡ ë‹¤ë¥¸ ë¸”ëŸ­ì´ ë“œë¡­ë˜ëŠ” ë™ì•ˆ ëŒ€ê¸°í•œë‹¤.
+            yield return WaitForDropping(movingBlocks);
+        }
+
+        /*
+         * ë¦¬ìŠ¤íŠ¸ì— í¬í•¨ëœ ë¸”ëŸ­ì˜ ì• ë‹ˆë©”ì´ì…˜ì´ ëë‚ ë•Œ ê¹Œì§€ ê¸°ë‹¤ë¦°ë‹¤.
+         */
+        public IEnumerator WaitForDropping(List<Block> movingBlocks)
+        {
+            WaitForSeconds waitForSecond = new WaitForSeconds(0.05f); //50ms ë§ˆë‹¤ ê²€ì‚¬í•œë‹¤.
+
+            while (true)
+            {
+                bool bContinue = false;
+
+                // ì´ë™ì¤‘ì¸ ë¸”ëŸ­ì´ ìˆëŠ”ì§€ ê²€ì‚¬í•˜ë‹¤.
+                for (int i = 0; i < movingBlocks.Count; i++)
+                {
+                    if (movingBlocks[i].isMoving)
+                    {
+                        bContinue = true;
+                        break;
+                    }
+                }
+
+                if (!bContinue)
+                    break;
+
+                yield return waitForSecond;
+            }
+
+            movingBlocks.Clear();
+            yield break;
         }
 
         #region Simple Methods
         //----------------------------------------------------------------------
-        // Á¶È¸(get/set/is) ¸Ş¼Òµå
+        // ì¡°íšŒ(get/set/is) ë©”ì†Œë“œ
         //----------------------------------------------------------------------
 
         /*
-         * º¸µå¾È¿¡¼­ ¹ß»ıÇÑ ÀÌº¥Æ®ÀÎÁö Ã¼Å©ÇÑ´Ù       
+         * ë³´ë“œì•ˆì—ì„œ ë°œìƒí•œ ì´ë²¤íŠ¸ì¸ì§€ ì²´í¬í•œë‹¤       
          */
         public bool IsInsideBoard(Vector2 ptOrg)
         {
-            // °è»êÀÇ ÆíÀÇ¸¦ À§ÇØ¼­ (0, 0)À» ±âÁØÀ¸·Î ÁÂÇ¥¸¦ ÀÌµ¿ÇÑ´Ù. 
-            // 8 x 8 º¸µåÀÎ °æ¿ì: x(-4 ~ +4), y(-4 ~ +4) -> x(0 ~ +8), y(0 ~ +8) 
+            // ê³„ì‚°ì˜ í¸ì˜ë¥¼ ìœ„í•´ì„œ (0, 0)ì„ ê¸°ì¤€ìœ¼ë¡œ ì¢Œí‘œë¥¼ ì´ë™í•œë‹¤. 
+            // 8 x 8 ë³´ë“œì¸ ê²½ìš°: x(-4 ~ +4), y(-4 ~ +4) -> x(0 ~ +8), y(0 ~ +8) 
             Vector2 point = new Vector2(ptOrg.x + (maxCol / 2.0f), ptOrg.y + (maxRow / 2.0f));
 
             if (point.y < 0 || point.x < 0 || point.y > maxRow || point.x > maxCol)
@@ -63,34 +179,50 @@ namespace RoyalMatch.Stage
         }
 
         /*
-         * À¯È¿ÇÑ ºí·°(ÀÌµ¿°¡´ÉÇÑ ºí·°) À§¿¡¼­ ÀÖ´ÂÁö Ã¼Å©ÇÑ´Ù.
-         * @param point Wordl ÁÂÇ¥, ÄÁÅ×ÀÌ³Ê ±âÁØ
-         * @param blockPos out ÆÄ¶ó¹ÌÅÍ, º¸µå¿¡ ÀúÀåµÈ ºí·°ÀÇ ÀÎµ¦½º
+         * ìœ íš¨í•œ ë¸”ëŸ­(ì´ë™ê°€ëŠ¥í•œ ë¸”ëŸ­) ìœ„ì—ì„œ ìˆëŠ”ì§€ ì²´í¬í•œë‹¤.
+         * @param point Wordl ì¢Œí‘œ, ì»¨í…Œì´ë„ˆ ê¸°ì¤€
+         * @param blockPos out íŒŒë¼ë¯¸í„°, ë³´ë“œì— ì €ì¥ëœ ë¸”ëŸ­ì˜ ì¸ë±ìŠ¤
          * 
-         * @return ½º¿ÍÀÌÇÁ °¡´ÉÇÏ¸é true
+         * @return ìŠ¤ì™€ì´í”„ ê°€ëŠ¥í•˜ë©´ true
          */
         public bool IsOnValideBlock(Vector2 point, out BlockPos blockPos)
         {
-            //1. World ÁÂÇ¥ -> º¸µåÀÇ ºí·° ÀÎµ¦½º·Î º¯È¯ÇÑ´Ù.
-            Vector2 pos = new Vector2(point.x + (maxCol / 2.0f), point.y + (maxRow / 2.0f));
+            //1. World ì¢Œí‘œ -> ë³´ë“œì˜ ë¸”ëŸ­ ì¸ë±ìŠ¤ë¡œ ë³€í™˜í•œë‹¤.
+            Vector2 pos = new Vector2(point.x + (maxCol/ 2.0f), point.y + (maxRow / 2.0f));
             int nRow = (int)pos.y;
             int nCol = (int)pos.x;
 
-            //¸®ÅÏÇÒ ºí·° ÀÎµ¦½º »ı¼º
+            //ë¦¬í„´í•  ë¸”ëŸ­ ì¸ë±ìŠ¤ ìƒì„±
             blockPos = new BlockPos(nRow, nCol);
 
-            //2. ½º¿ÍÀÌÇÁ °¡´ÉÇÑÁö Ã¼Å©ÇÑ´Ù.
+            //2. ìŠ¤ì™€ì´í”„ ê°€ëŠ¥í•œì§€ ì²´í¬í•œë‹¤.
             return board.IsSwipeable(nRow, nCol);
         }
 
-        #endregion 
+
+        /**
+         * ì£¼ì–´ì§„ ìœ„ì¹˜(nRow, nCol)ì—ì„œ ë°œìƒëœ ìŠ¤ì™€ì´í”„ ì•¡ì…˜ì´ ìœ íš¨í•œì§€ ì²´í¬í•œë‹¤.
+         */
+        public bool IsValideSwipe(int nRow, int nCol, Swipe swipeDir)
+        {
+            switch (swipeDir)
+            {
+                case Swipe.DOWN: return nRow > 0; ;
+                case Swipe.UP: return nRow < maxRow - 1;
+                case Swipe.LEFT: return nCol > 0;
+                case Swipe.RIGHT: return nCol < maxCol - 1;
+                default:
+                    return false;
+            }
+        }
+        #endregion
 
         public void PrintAll()
         {
             System.Text.StringBuilder strCells = new System.Text.StringBuilder();
             System.Text.StringBuilder strBlocks = new System.Text.StringBuilder();
 
-            for (int nRow = maxRow - 1; nRow >= 0; nRow--)
+            for (int nRow = maxRow -1; nRow >=0; nRow--)
             {
                 for (int nCol = 0; nCol < maxCol; nCol++)
                 {
@@ -104,70 +236,6 @@ namespace RoyalMatch.Stage
 
             Debug.Log(strCells.ToString());
             Debug.Log(strBlocks.ToString());
-        }
-
-
-        //½º¿ÍÀÌÇÁ ´ë»óÀº ºí·° -> ºí·°ÀÇ Á¤º¸´Â º¸µå°¡ °ü¸®ÇÏ°í ÀÖÀ½ -> º¸µå¿¡ ´ëÇÑ ¸í·ÉÀº Stage°¡ ÃÑ°ı
-        // ±×·¯¹Ç·Î ½º¿ÍÀÌÇÁ ¾×¼ÇÀº Stage¿¡¼­ ¿äÃ»ÇÒ °Í
-        public IEnumerator CoDoSwipeAction(int nRow, int nCol, Swipe swipeDir, Returnable<bool> actionResult)
-        {
-            //ÄÚ·çÆ¾ ½ÇÇà °á°ú¸¦ Àü´ŞÇÏ´Â °´Ã¼¿¡ ÃÊ±â°ªÀ¸·Î false¸¦ ¼³Á¤
-            actionResult.value = false;
-
-
-            int nSwipeRow = nRow, nSwipeCol = nCol;
-            nSwipeRow += swipeDir.GetTargetRow();
-            nSwipeCol += swipeDir.GetTargetCol();
-
-            Debug.Assert(nRow != nSwipeRow || nCol != nSwipeCol, "Invalid Swipe : ({nSwipeRow} , {nSwipeCol})");
-            Debug.Assert(nSwipeRow >= 0 && nSwipeCol < maxRow && nSwipeCol >= 0 && nSwipeCol < maxCol, $"Swipe Å¸°Ù ºí·° ÀÎµ¦½º ¿À·ù = ({nSwipeRow},{nSwipeCol})");
-
-            //½º¿ÍÀÌÇÁ ´ë»óÀÌ µÇ´Â µÎ°³ÀÇ ºí·° Á¤º¸¸¦ ±¸ÇØ¼­ ½º¿ÍÀÌÇÁ ¾×¼ÇÀ» ½ÇÇàÇÑ´Ù.
-            if (m_Board.IsSwipeable(nSwipeRow,nSwipeCol))
-            {
-                //½º¿ÍÀÌÇÁ ´ë»ó Block °´Ã¼¿Í À§Ä¡ Á¤º¸¸¦ ±¸ÇÏ±â
-                Block targetBlock = blocks[nSwipeRow, nSwipeCol];
-                Block baseBlock = blocks[nRow, nCol];
-
-                Debug.Assert(baseBlock != null && targetBlock != null);
-
-                Vector3 basePos = baseBlock.blockObj.transform.position;
-                Vector3 targetPos = targetBlock.blockObj.transform.position;
-
-                if(targetBlock.IsSwipeable(baseBlock))
-                {
-                    //ºí·°¿¡°Ô ÁöÁ¤µÈ À§Ä¡·Î ÀÌµ¿ÇÏµµ·Ï ¿äÃ»
-                    //ÇÁ·¹ÀÓ¸¶´Ù ºí·°ÀÌ ÀÌµ¿ÇÏ´Â ¸ğ½ÀÀ» º¼ ¼ö ÀÖ´Ù.
-                    //ÀÌµ¿À» ¿äÃ»¹ŞÀº ºí·°Àº ÄÚ·çÆ¾À» »ı¼ºÇØ¼­ ÇÁ·¹ÀÓ¸¶´Ù ºí·°ÀÇ À§Ä¡¸¦ º¯°æÇÒ °ÍÀÌ´Ù.
-                    baseBlock.MoveTo(targetPos, Constants.SWIPE_DURATION);
-                    targetBlock.MoveTo(basePos, Constants.SWIPE_DURATION);
-
-                    //½º¿ÍÀÌÇÁ ¾×¼ÇÀÌ ½ÇÇàµÇ´Â µ¿¾È ´ë±âÇÑ´Ù.
-                    yield return new WaitForSeconds(Constants.SWIPE_DURATION);
-
-                    //½º¿ÍÀÌÇÁ ¾×¼ÇÀÌ Á¾·áµÇ¸é º¸µå¿¡ ÀúÀåµÈ ºí·°ÀÇ À§Ä¡¸¦ ¼­·Î ¹Ù²Û´Ù.
-                    //ÃÖÁ¾ÀûÀ¸·Î ½º¿ÍÀÌÇÁ ´ë»ó 2°³ÀÇ ºí·° À§Ä¡°¡ º¯°æµÈ´Ù.
-                    blocks[nRow, nCol] = targetBlock;
-                    blocks[nSwipeRow, nSwipeCol] = baseBlock;
-
-                    //¾×¼Ç ¼öÇà °á°ú·Î true¸¦ ¼³Á¤ÇÑ´Ù.
-                    actionResult.value = true;
-                }
-            }
-            yield break;
-        }
-
-        //ÁÖ¾îÁø À§Ä¡°¡ ½º¿ÍÀÌÇÁ ¾×¼ÇÀÌ À¯È¿ÇÑÁö Ã¼Å©ÇÏ´Â ¸Ş¼Òµå
-        public bool IsValideSwipe(int nRow, int nCol, Swipe swipeDir)
-        {
-            switch(swipeDir)
-            {
-                case Swipe.DOWN: return nRow > 0; 
-                case Swipe.UP: return nRow < maxRow - 1; 
-                case Swipe.LEFT: return nCol > 0; 
-                case Swipe.RIGHT:return nCol < maxCol - 1;
-                default: return false;
-            }
         }
     }
 }

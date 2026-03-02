@@ -1,8 +1,10 @@
-using UnityEngine;
-
-namespace RoyalMatch.Util
+ï»¿namespace Ninez.Util
 {
-    //ÄÚ·çÆ¾ÀÇ °á°ú¸¦ ¼ö½ÅÇÏ±â À§ÇÑ ¹ü¿ë Å¬·¡½º
+    /*
+     * ì£¼ë¡œ ì½”ë£¨í‹´ì˜ íŒŒë¼ë¯¸í„°ë¡œ ì „ë‹¬ë˜ì–´ì„œ ì½”ë£¨í‹´ ì‹¤í–‰ ê²°ê³¼ë¥¼ ë°›ê³ ì í•˜ëŠ” ê²½ìš°ì— ì‚¬ìš©í•œë‹¤.
+     * Returnable<bool> r;    
+     * ex) yield return StartCoroutine(MyCoroutine( r ))
+     */
     public class Returnable<T>
     {
         public T value { get; set; }
@@ -13,4 +15,3 @@ namespace RoyalMatch.Util
         }
     }
 }
-

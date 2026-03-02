@@ -1,18 +1,19 @@
+ï»¿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace RoyalMatch.Util
+namespace Ninez.Util
 {
     /**/
     public enum Swipe
     {
-        NA = -1,
-        RIGHT = 0,
-        UP = 1,
-        LEFT = 2,
-        DOWN = 3
+        NA      = -1,
+        RIGHT   = 0,
+        UP      = 1,
+        LEFT    = 2,
+        DOWN    = 3
     }
 
-    //½º¿ÍÀÌÇÁ ¾×¼ÇÀÌ ¼öÇàµÉ ¶§ ´ë»ó ºí·°ÀÇ À§Ä¡ offset¸¦ ±¸ÇÏ´Â ¿ªÇÒÀ» ¼öÇà
     public static class SwipeDirMethod
     {
         public static int GetTargetRow(this Swipe swipeDir)
@@ -42,7 +43,7 @@ namespace RoyalMatch.Util
     public static class TouchEvaluator
     {
         /*
-         * µÎ ÁöÁ¡À» »ç¿ëÇÏ¿© Swipe ¹æÇâÀ» ±¸ÇÑ´Ù.
+         * ë‘ ì§€ì ì„ ì‚¬ìš©í•˜ì—¬ Swipe ë°©í–¥ì„ êµ¬í•œë‹¤.
          * UP : 45~ 135, LEFT : 135 ~ 225, DOWN : 225 ~ 315, RIGHT : 0 ~ 45, 0 ~ 315
          */
         public static Swipe EvalSwipeDir(Vector2 vtStart, Vector2 vtEnd)
@@ -65,8 +66,8 @@ namespace RoyalMatch.Util
         }
 
         /*
-         * µÎ Æ÷ÀÎÆ® »çÀÌÀÇ °¢µµ¸¦ ±¸ÇÑ´Ù.
-         * Input(¸¶¿ì½º, ÅÍÄ¡) ÀåÄ¡ µå·¡±×½Ã¿¡ µå·¡±×ÇÑ °¢µµ¸¦ ±¸ÇÏ´Âµ¥ È°¿ëÇÑ´Ù.
+         * ë‘ í¬ì¸íŠ¸ ì‚¬ì´ì˜ ê°ë„ë¥¼ êµ¬í•œë‹¤.
+         * Input(ë§ˆìš°ìŠ¤, í„°ì¹˜) ì¥ì¹˜ ë“œë˜ê·¸ì‹œì— ë“œë˜ê·¸í•œ ê°ë„ë¥¼ êµ¬í•˜ëŠ”ë° í™œìš©í•œë‹¤.
          */
         static float EvalDragAngle(Vector2 vtStart, Vector2 vtEnd)
         {

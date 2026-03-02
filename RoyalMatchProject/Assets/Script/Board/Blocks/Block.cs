@@ -1,12 +1,21 @@
+ï»¿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using Ninez.Quest;
 
-namespace RoyalMatch.Board
+namespace Ninez.Board
 {
     public class Block
     {
         //---------------------------------------------------------------------
         // Members
         //---------------------------------------------------------------------
+        public BlockStatus status;
+        public BlockQuestType questType;
+
+        public MatchType match = MatchType.NONE;
+
+        public short matchCount;
 
         //---------------------------------------------------------------------
         // Properties 
@@ -18,7 +27,7 @@ namespace RoyalMatch.Board
             set { m_BlockType = value; }
         }
 
-        protected BlockBreed m_Breed;   //·»´õ¸µµÇ´Â ºí·° Ä³¸°ÅÍ(Áï, ÀÌ¹ÌÁö Á¾·ù)
+        protected BlockBreed m_Breed;   //ë Œë”ë§ë˜ëŠ” ë¸”ëŸ­ ìºë¦°í„°(ì¦‰, ì´ë¯¸ì§€ ì¢…ë¥˜)
         public BlockBreed breed
         {
             get { return m_Breed; }
@@ -42,19 +51,44 @@ namespace RoyalMatch.Board
 
         public Transform blockObj { get { return m_BlockBehaviour?.transform; } }
 
-        Vector2Int m_vtDuplicate;       // ºí·° Á¨, Shuffle½Ã¿¡ Áßº¹°Ë»ç¿¡ »ç¿ë. stage file¿¡¼­ »ı¼º½Ã (-1, -1)
-        //Áßº¹ °Ë»ç½Ã »ç¿ë 
+        Vector2Int m_vtDuplicate;       // ë¸”ëŸ­ ì  , Shuffleì‹œì— ì¤‘ë³µê²€ì‚¬ì— ì‚¬ìš©. stage fileì—ì„œ ìƒì„±ì‹œ (-1, -1)
+        //ì¤‘ë³µ ê²€ì‚¬ì‹œ ì‚¬ìš© 
         public int horzDuplicate
         {
             get { return m_vtDuplicate.x; }
             set { m_vtDuplicate.x = value; }
         }
 
-        //Áßº¹ °Ë»ç½Ã »ç¿ë 
+        //ì¤‘ë³µ ê²€ì‚¬ì‹œ ì‚¬ìš© 
         public int vertDuplicate
         {
             get { return m_vtDuplicate.y; }
             set { m_vtDuplicate.y = value; }
+        }
+
+        int m_nDurability;                 //ë‚´êµ¬ë„
+        public virtual int durability
+        {
+            get { return m_nDurability; }
+            set { m_nDurability = value; }
+        }
+
+        protected BlockActionBehaviour m_BlockActionBehaviour;
+
+        public bool isMoving
+        {
+            get
+            {
+                return blockObj != null && m_BlockActionBehaviour.isMoving;
+            }
+        }
+
+        public Vector2 dropDistance
+        {
+            set
+            {
+                m_BlockActionBehaviour?.MoveDrop(value);
+            }
         }
 
         //---------------------------------------------------------------------
@@ -64,6 +98,13 @@ namespace RoyalMatch.Board
         public Block(BlockType blockType)
         {
             m_BlockType = blockType;
+
+            status = BlockStatus.NORMAL;
+            questType = BlockQuestType.CLEAR_SIMPLE;
+            match = MatchType.NONE;
+            m_Breed = BlockBreed.NA;
+
+            m_nDurability = 1;
         }
 
         //---------------------------------------------------------------------
@@ -71,44 +112,118 @@ namespace RoyalMatch.Board
         //---------------------------------------------------------------------
 
         /// <summary>
-        /// ºí·°À» µğ½ºÇÃ·¹ÀÌÇÏ´Â GameObject¸¦ »ı¼ºÇÑ´Ù. Ãâ·ÂÀÌ ÇÊ¿äÇÑ °æ¿ì¿¡¸¸ »ı¼ºÇÑ´Ù.
+        /// ë¸”ëŸ­ì„ ë””ìŠ¤í”Œë ˆì´í•˜ëŠ” GameObjectë¥¼ ìƒì„±í•œë‹¤. ì¶œë ¥ì´ í•„ìš”í•œ ê²½ìš°ì—ë§Œ ìƒì„±í•œë‹¤.
         /// 
         /// </summary>
         /// <param name="blockPrefab"></param>
         /// <param name="containerObj"></param>
-        /// <returns>return ºñ¾îÀÖ´Â ºí·°ÀÎ °æ¿ì null, À¯È¿ÇÑ °æ¿ì ÇöÀç block</returns>
+        /// <returns>return ë¹„ì–´ìˆëŠ” ë¸”ëŸ­ì¸ ê²½ìš° null, ìœ íš¨í•œ ê²½ìš° í˜„ì¬ block</returns>
         internal Block InstantiateBlockObj(GameObject blockPrefab, Transform containerObj)
         {
-            //À¯È¿ÇÏÁö ¾ÊÀº ºí·°ÀÎ °æ¿ì, Block GameObject¸¦ »ı¼ºÇÏÁö ¾Ê´Â´Ù.
+            //ìœ íš¨í•˜ì§€ ì•Šì€ ë¸”ëŸ­ì¸ ê²½ìš°, Block GameObjectë¥¼ ìƒì„±í•˜ì§€ ì•ŠëŠ”ë‹¤.
             if (IsValidate() == false)
                 return null;
 
-            //1. Block ¿ÀºêÁ§Æ®¸¦ »ı¼ºÇÑ´Ù.
+            //1. Block ì˜¤ë¸Œì íŠ¸ë¥¼ ìƒì„±í•œë‹¤.
             GameObject newObj = Object.Instantiate(blockPrefab, new Vector3(0, 0, 0), Quaternion.identity);
 
-            //2. ÄÁÅ×ÀÌ³Ê(Board)ÀÇ Â÷ÀÏµå·Î BlockÀ» Æ÷ÇÔ½ÃÅ²´Ù.
+            //2. ì»¨í…Œì´ë„ˆ(Board)ì˜ ì°¨ì¼ë“œë¡œ Blockì„ í¬í•¨ì‹œí‚¨ë‹¤.
             newObj.transform.parent = containerObj;
 
-            //3. Block ¿ÀºêÁ§Æ®¿¡ Àû¿ëµÈ BlockBehaviour ÄÄÆ÷³ÊÆ®¸¦ º¸°üÇÑ´Ù.
+            //3. Block ì˜¤ë¸Œì íŠ¸ì— ì ìš©ëœ BlockBehaviour ì»´í¬ë„ˆíŠ¸ë¥¼ ë³´ê´€í•œë‹¤.
             this.blockBehaviour = newObj.transform.GetComponent<BlockBehaviour>();
+            m_BlockActionBehaviour = newObj.transform.GetComponent<BlockActionBehaviour>();
 
             return this;
         }
 
+        /*
+         * ë¸”ëŸ­ì˜ ì»¨í…ìŠ¤íŠ¸(ì¢…ë¥˜, ìƒíƒœ, ì¹´ìš´íŠ¸, í€˜ìŠ¤íŠ¸ì¡°ê±´ ë“±)ì— í•´ë‹¹í•˜ëŠ” ë™ì‘ì„ ìˆ˜í–‰í•˜ë„ë¡ í•œë‹¤.
+         * return íŠ¹ìˆ˜ë¸”ëŸ­ì´ë©´ true, ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ false    
+         */
+        public bool DoEvaluation(BoardEnumerator boardEnumerator, int nRow, int nCol)
+        {
+            //ë§¤ì¹­ ë¡œì§ ì„ì‹œ ì ìš©, Qeust ì²˜ë¦¬ ë³„ë„ í´ë˜ìŠ¤ ë¶„ë¦¬ í•„ìš”
+
+            Debug.Assert(boardEnumerator != null, $"({nRow},{nCol})");
+
+            if (!IsEvaluatable())
+                return false;
+
+            //1. ë§¤ì¹˜ ìƒíƒœ(í´ë¦¬ì–´ ì¡°ê±´ ì¶©ì¡±)ì¸ ê²½ìš°
+            if (status == BlockStatus.MATCH)
+            {
+                if (questType == BlockQuestType.CLEAR_SIMPLE || boardEnumerator.IsCageTypeCell(nRow, nCol)) //TODO cagetype cell ì¡°ê±´ì´ í•„ìš”í•œê°€? 
+                {
+                    Debug.Assert(m_nDurability > 0, $"durability is zero : {m_nDurability}");
+
+                    durability--;
+                }
+                else //íŠ¹ìˆ˜ë¸”ëŸ­
+                {
+                    return true;
+                }
+
+                if (m_nDurability == 0)
+                {
+                    status = BlockStatus.CLEAR;
+                    return false;
+                }
+            }
+
+            //2. í´ë¦¬ì–´ ì¡°ê±´ì— ì•„ì§ ë„ë‹¬í•˜ì§€ ì•ŠëŠ” ê²½ìš° NORMAL ìƒíƒœë¡œ ë³µê·€
+            status = BlockStatus.NORMAL;
+            match = MatchType.NONE;
+            matchCount = 0;
+
+            return false;
+        }
+
+        /*
+         * ë¸”ëŸ­ì˜ ìƒíƒœë¥¼ MATCH ë¡œ ì„¤ì •í•œë‹¤.
+         * @param bAccumulate ê¸°ì¡´ê°’ì— ë”í•´ì§„ ê°’ìœ¼ë¡œ ëˆ„ì ë˜ëŠ” ê²½ìš° true    
+         */
+        public void UpdateBlockStatusMatched(MatchType matchType, bool bAccumulate = true)
+        {
+            this.status = BlockStatus.MATCH;
+
+            if (match == MatchType.NONE)
+            {
+                this.match = matchType;
+            }
+            else
+            {
+                this.match = bAccumulate ? match.Add(matchType) : matchType; //match + matchType
+            }
+
+            matchCount = (short)matchType;
+        }
+
         /// <summary>
-        /// ÁöÁ¤µÈ À§Ä¡·Î Bloc GameObjectÀ§ À§Ä¡(Position)À» º¯°æÇÑ´Ù
+        /// ì§€ì •ëœ ìœ„ì¹˜ë¡œ Bloc GameObjectìœ„ ìœ„ì¹˜(Position)ì„ ë³€ê²½í•œë‹¤
         /// </summary>
-        /// <param name="x">X ÁÂÇ¥ : ¾À ±âÁØ</param>
-        /// <param name="y">Y ÁÂÇ¥ : ¾À ±âÁØ</param>
+        /// <param name="x">X ì¢Œí‘œ : ì”¬ ê¸°ì¤€</param>
+        /// <param name="y">Y ì¢Œí‘œ : ì”¬ ê¸°ì¤€</param>
         internal void Move(float x, float y)
         {
             blockBehaviour.transform.position = new Vector3(x, y);
         }
 
+        public void MoveTo(Vector3 to, float duration)
+        {
+            m_BlockBehaviour.StartCoroutine(Util.Action2D.MoveTo(blockObj, to, duration));
+        }
+
+        public virtual void Destroy()
+        {
+            Debug.Assert(blockObj != null, $"{match}");
+            blockBehaviour.DoActionClear();
+        }
+
         /// <summary>
-        /// À¯È¿ÇÑ ºí·°ÀÎÁö Ã¼Å©ÇÑ´Ù.
-        /// EMPTY Å¸ÀÔÀ» Á¦¿ÜÇÏ°í ¸ğµç ºí·°ÀÌ À¯È¿ÇÑ °ÍÀ¸·Î °£ÁÖÇÑ´Ù.
-        /// Block GameObject »ı¼º µîÀÇ ÆÇ´Ü¿¡ »ç¿ëµÈ´Ù.
+        /// ìœ íš¨í•œ ë¸”ëŸ­ì¸ì§€ ì²´í¬í•œë‹¤.
+        /// EMPTY íƒ€ì…ì„ ì œì™¸í•˜ê³  ëª¨ë“  ë¸”ëŸ­ì´ ìœ íš¨í•œ ê²ƒìœ¼ë¡œ ê°„ì£¼í•œë‹¤.
+        /// Block GameObject ìƒì„± ë“±ì˜ íŒë‹¨ì— ì‚¬ìš©ëœë‹¤.
         /// </summary>
         /// <returns></returns>
         public bool IsValidate()
@@ -123,10 +238,10 @@ namespace RoyalMatch.Board
         }
 
         /// <summary>
-        /// target Block°ú °°Àº breed¸¦ °¡Áö°í ÀÖ´ÂÁö °Ë»çÇÑ´Ù.
+        /// target Blockê³¼ ê°™ì€ breedë¥¼ ê°€ì§€ê³  ìˆëŠ”ì§€ ê²€ì‚¬í•œë‹¤.
         /// </summary>
-        /// <param name="target">ºñ±³ÇÒ ´ë»ó Block</param>
-        /// <returns>breed°¡ °°À¸¸é true, ´Ù¸£¸é false</returns>
+        /// <param name="target">ë¹„êµí•  ëŒ€ìƒ Block</param>
+        /// <returns>breedê°€ ê°™ìœ¼ë©´ true, ë‹¤ë¥´ë©´ false</returns>
         public bool IsEqual(Block target)
         {
             if (IsMatchableBlock() && this.breed == target.breed)
@@ -136,29 +251,32 @@ namespace RoyalMatch.Board
         }
 
         /*
-         * 3 ¸ÅÄªÀ¸·Î Á¦°Å °¡´ÉÇÑ ºí·°ÀÎÁö °Ë»çÇÑ´Ù.
+         * 3 ë§¤ì¹­ìœ¼ë¡œ ì œê±° ê°€ëŠ¥í•œ ë¸”ëŸ­ì¸ì§€ ê²€ì‚¬í•œë‹¤.
          */
         public bool IsMatchableBlock()
         {
             return !(type == BlockType.EMPTY);
         }
 
-        //ºí·°ÀÇ À§Ä¡¸¦ ÁÖ¾îÁø À§Ä¡·Î Á¤ÇØÁø ½Ã°£µ¿¾È ÀÌµ¿ÇÏ´Â ¸Ş¼Òµå
-        //ÄÚ·çÆ¾À» »ı¼ºÇØ¼­ Action2D °´Ã¼¿¡ Move¾Ö´Ï¸ŞÀÌ¼ÇÀ» À§ÀÓÇÑ´Ù.
-        public void MoveTo(Vector3 to, float duration)
-        {
-            m_BlockBehaviour.StartCoroutine(Util.Action2D.MoveTo(blockObj, to, duration));
-
-        }
-
-        //swipe °¡´ÉÇÑ ºí·°ÀÎÁö Ã¼Å©ÇÑ´Ù.
-        //baseBlock : ½º¿ÍÀÌÇÁ ±âÁØ ºí·°, ±âÁØºí·°ÀÇ Á¾·ù¿¡ µû¶ó¼­ °¡´É ¿©ºÎ°¡ ´Ş¶óÁø´Ù.
-        //È®Àå¼ºÀ» °í·ÁÇØ¼­ Á¦°øÇÏ´Â ¸Ş¼Òµå·Î ÇöÀç´Â Á¶°Ç¾øÀÌ true¸¦ ¸®ÅÏÇÑ´Ù.
+        /*
+         * swipe ê°€ëŠ¥í•œ ë¸”ëŸ­ì¸ì§€ ì²´í¬í•œë‹¤
+         * @param baseBlock ìŠ¤ì™€ì´í”„ ê¸°ì¤€ ë¸”ëŸ­, ê¸°ì¤€ë¸”ëŸ­ ì¢…ë¥˜ì— ë”°ë¼ì„œ ê°€ëŠ¥ ì—¬ë¶€ê°€ ë‹¬ë¼ì§„ë‹¤    
+         */
         public bool IsSwipeable(Block baseBlock)
         {
             return true;
         }
 
+        /*
+         * Evaluation ëŒ€ìƒì— ì í•©í•œì§€ ì²´í¬í•œë‹¤
+         */
+        public bool IsEvaluatable()
+        {
+            //ì´ë¯¸ ì²˜ë¦¬ì™„ë£Œ(CLEAR) ë˜ì—ˆê±°ë‚˜, í˜„ì¬ ì²˜ë¦¬ì¤‘ì¸ ë¸”ëŸ­ì¸ ê²½ìš°
+            if (status == BlockStatus.CLEAR || !IsMatchableBlock())
+                return false;
+
+            return true;
+        }
     }
 }
-

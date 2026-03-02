@@ -1,26 +1,26 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
-namespace RoyalMatch.Stage
+namespace Ninez.Stage
 {
     public static class StageReader
     {
         /// <summary>
-        /// ½ºÅ×ÀÌÁö ±¸¼ºÀ» À§ÇØ¼­ ±¸¼ºÁ¤º¸¸¦ ·ÎµåÇÑ´Ù. 
+        /// ìŠ¤í…Œì´ì§€ êµ¬ì„±ì„ ìœ„í•´ì„œ êµ¬ì„±ì •ë³´ë¥¼ ë¡œë“œí•œë‹¤. 
         /// </summary>
-        /// <param name="nStage"> ½ºÅ×ÀÌÁö ¹øÈ£</param>
+        /// <param name="nStage"> ìŠ¤í…Œì´ì§€ ë²ˆí˜¸</param>
         /// <returns></returns>
         public static StageInfo LoadStage(int nStage)
         {
             Debug.Log($"Load Stage : Stage/{GetFileName(nStage)}");
 
-            //1. ¸®¼Ò½º ÆÄÀÏ¿¡¼­ ÅØ½ºÆ®¸¦ ÀĞ¾î¿Â´Ù.
+            //1. ë¦¬ì†ŒìŠ¤ íŒŒì¼ì—ì„œ í…ìŠ¤íŠ¸ë¥¼ ì½ì–´ì˜¨ë‹¤.
             TextAsset textAsset = Resources.Load<TextAsset>($"Stage/{GetFileName(nStage)}");
             if (textAsset != null)
             {
-                //2. JSON ¹®ÀÚ¿­À» °´Ã¼(StageInfo)·Î º¯È¯ÇÑ´Ù.
+                //2. JSON ë¬¸ìì—´ì„ ê°ì²´(StageInfo)ë¡œ ë³€í™˜í•œë‹¤.
                 StageInfo stageInfo = JsonUtility.FromJson<StageInfo>(textAsset.text);
 
-                //3. º¯È¯µÈ °´Ã¼°¡ À¯È¿ÇÑÁö Ã¼Å©ÇÑ´Ù(only Debugging)
+                //3. ë³€í™˜ëœ ê°ì²´ê°€ ìœ íš¨í•œì§€ ì²´í¬í•œë‹¤(only Debugging)
                 Debug.Assert(stageInfo.DoValidation());
 
                 return stageInfo;
@@ -30,8 +30,8 @@ namespace RoyalMatch.Stage
         }
 
         /// <summary>
-        /// ½ºÅ×ÀÌÁö ÆÄÀÏ ÀÌ¸§À» ±¸ÇÑ´Ù.
-        /// format : stage_0001 -> 4ÀÚ¸´¼ö ³×ÀÌ¹Ö Àû¿ë, ¸®¼Ò½º ÆÄÀÏ¿¡¼­ ·ÎµùÇÏ´Â °æ¿ì È®ÀåÀÚ »ı·«
+        /// ìŠ¤í…Œì´ì§€ íŒŒì¼ ì´ë¦„ì„ êµ¬í•œë‹¤.
+        /// format : stage_0001 -> 4ìë¦¿ìˆ˜ ë„¤ì´ë° ì ìš©, ë¦¬ì†ŒìŠ¤ íŒŒì¼ì—ì„œ ë¡œë”©í•˜ëŠ” ê²½ìš° í™•ì¥ì ìƒëµ
         /// </summary>
         /// <param name="nStage"></param>
         /// <returns></returns>
@@ -41,4 +41,3 @@ namespace RoyalMatch.Stage
         }
     }
 }
-

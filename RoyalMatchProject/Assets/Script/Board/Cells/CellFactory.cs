@@ -1,7 +1,8 @@
-using UnityEditor.Experimental.GraphView;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace RoyalMatch.Board
+namespace Ninez.Board
 {
     public static class CellFactory
     {
@@ -19,5 +20,3 @@ namespace RoyalMatch.Board
         }
     }
 }
-
-

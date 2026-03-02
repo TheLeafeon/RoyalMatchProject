@@ -1,26 +1,27 @@
+ï»¿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using System.Collections;
 
-namespace RoyalMatch.Util
+namespace Ninez.Util
 {
-    //ÁöÁ¤µÈ ½Ã°£µ¿¾È ÁöÁ¤µÈ À§Ä¡·Î GameObject¸¦ ÀÌµ¿½ÃÅ°´Â MoveTo ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ¼öÇà
     public static class Action2D
     {
-        //target:ÀÌµ¿½ÃÅ³ ´ë»ó, to: ÀÌµ¿ÇÒ ¸ñÇ¥ À§Ä¡, duration : ÀÌµ¿ ½Ã°£, bSeflRmove : ¾Ö´Ï¸ŞÀÌ¼Ç Á¾·áÈÄ »èÁ¦ ¿©ºÎ ÇÃ·¡±×
+        /*
+         * ì§€ì •ëœ ì‹œê°„ë™ì•ˆ ì§€ì •ëœ ìœ„ì¹˜ë¡œ ì´ë™í•œë‹¤.
+         * 
+         * @param target ì• ë‹ˆë©”ì´ì…˜ì„ ì ìš©í•  íƒ€ê²Ÿ GameObject
+         * @param to ì´ë™í•  ëª©í‘œ ìœ„ì¹˜
+         * @param duration ì´ë™ ì‹œê°„
+         * @param bSelfRemove ì• ë‹ˆë©”ì´ì…˜ ì¢…ë¥˜ í›„ íƒ€ê²Ÿ GameObject ì‚­ì œ ì—¬ë¶€ í”Œë˜ê·¸
+         */
         public static IEnumerator MoveTo(Transform target, Vector3 to, float duration, bool bSelfRemove = false)
         {
-            //½ÃÀÛÀ§Ä¡ ÀúÀå
-            Vector2 startPos =target.transform.position;
+            Vector2 startPos = target.transform.position;
 
             float elapsed = 0.0f;
-            //ÁÖ¾îÁø ÀÌµ¿½Ã°£ÀÌ ¾ó¸¶³ª ³²¾Ò´ÂÁö Ã¼Å©
             while (elapsed < duration)
             {
                 elapsed += Time.smoothDeltaTime;
-                /*
-                 * ¼±Çü º¸°£¹ıÀ» »ç¿ëÇØ¼­  GameObjectÀÇ ÁÂÇ¥(transform.position)À» ÀÌµ¿½ÃÅ²´Ù
-                 * °æ°ú½Ã°£À» ÀüÃ¼ ÀÌµ¿½Ã°£À¸·Î ³ª´©¾î¼­ ½Ã°£ÀÇ º¯È­·®À» 0~ 1.0 À¸·Î °è»êÇÑ´Ù.
-                 */
                 target.transform.position = Vector2.Lerp(startPos, to, elapsed / duration);
 
                 yield return null;
@@ -28,11 +29,36 @@ namespace RoyalMatch.Util
 
             target.transform.position = to;
 
-            if(bSelfRemove )
-                Object.Destroy(target.gameObject,0.1f);
+            if (bSelfRemove)
+                Object.Destroy(target.gameObject, 0.1f);
 
             yield break;
         }
+
+        /*
+         * param toScale ì»¤ì§€ëŠ(ì¤„ì–´ì§€ëŠ”) í¬ê¸°, ì˜ˆë¥¼ ë“¤ì–´, 0.5ì¸ ê²½ìš° í˜„ì¬ í¬ê¸°ì—ì„œ ì ˆë°˜ìœ¼ë¡œ ì¤„ì–´ë“ ë‹¤.
+         * param speed ì´ˆë‹¹ ì»¤ì§€ëŠ” ì†ë„. ì˜ˆë¥¼ ë“¤ì–´, 2ì¸ ê²½ìš° ì´ˆë‹¹ 2ë°° ë§Œí¼ ì»¤ì§€ê±°ë‚˜ ì¤„ì–´ë“ ë‹¤. 
+         */
+        public static IEnumerator Scale(Transform target, float toScale, float speed)
+        {
+            //1. ë°©í–¥ ê²°ì • : ì»¤ì§€ëŠ” ë°©í–¥ì´ë©´ +, ì¤„ì–´ë“œëŠ” ë°©í–¥ì´ë©´ -
+            bool bInc = target.localScale.x < toScale;
+            float fDir = bInc ? 1 : -1;
+
+            float factor;
+            while (true)
+            {
+                factor = Time.deltaTime * speed * fDir;
+                target.localScale = new Vector3(target.localScale.x + factor, target.localScale.y + factor, target.localScale.z);
+
+                if ((!bInc && target.localScale.x <= toScale) || (bInc && target.localScale.x >= toScale))
+                    break;
+
+                yield return null;
+            }
+
+            yield break;
+        }
+
     }
 }
-

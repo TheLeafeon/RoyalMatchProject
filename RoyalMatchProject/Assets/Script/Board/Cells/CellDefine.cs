@@ -1,12 +1,15 @@
+ï»¿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-namespace RoyalMatch.Board
+namespace Ninez.Board
 {
     public enum CellType
     {
-        EMPTY = 0,      //ºó°ø°£, ºí·°ÀÌ À§Ä¡ÇÒ ¼ö ¾øÀ½, µå·Ó Åë°ú
-        BASIC = 1,      //¹è°æÀÖ´Â ±âº» Çü (No action)
-        FIXTURE = 2,    //°íÁ¤µÈ Àå¾Ö¹°. º¯È­¾øÀ½
-        JELLY = 3,      //Á©¸® : ºí·° ÀÌµ¿ OK, ºí·° CLEARµÇ¸é BASIC, Ãâ·Â : CellBg
+        EMPTY = 0,      //ë¹ˆê³µê°„, ë¸”ëŸ­ì´ ìœ„ì¹˜í•  ìˆ˜ ì—†ìŒ, ë“œë¡­ í†µê³¼
+        BASIC = 1,      //ë°°ê²½ìžˆëŠ” ê¸°ë³¸ í˜• (No action)
+        FIXTURE = 2,    //ê³ ì •ëœ ìž¥ì• ë¬¼. ë³€í™”ì—†ìŒ
+        JELLY = 3,      //ì ¤ë¦¬ : ë¸”ëŸ­ ì´ë™ OK, ë¸”ëŸ­ CLEARë˜ë©´ BASIC, ì¶œë ¥ : CellBg
     }
 
 
@@ -20,7 +23,7 @@ namespace RoyalMatch.Board
     static class CellTypeMethod
     {
         /*
-         * ºí·°ÀÌ À§Ä¡ÇÒ ¼ö ÀÖ´Â Å¸ÀÔÀÎÁö Ã¼Å©ÇÑ´Ù. ÇöÀç À§Ä¡ÇÑ ºí·°ÀÇ »óÅÂ¿Í °ü°è¾÷À½.
+         * ë¸”ëŸ­ì´ ìœ„ì¹˜í•  ìˆ˜ ìžˆëŠ” íƒ€ìž…ì¸ì§€ ì²´í¬í•œë‹¤. í˜„ìž¬ ìœ„ì¹˜í•œ ë¸”ëŸ­ì˜ ìƒíƒœì™€ ê´€ê³„ì—…ìŒ.
          */
         public static bool IsBlockAllocatableType(this CellType cellType)
         {
@@ -28,7 +31,7 @@ namespace RoyalMatch.Board
         }
 
         /*
-         * ºí·°ÀÌ ´Ù¸¥ À§Ä¡·Î ÀÌµ¿ °¡´ÉÇÑ Å¸ÀÔÀÎÁö Ã¼Å©ÇÑ´Ù. ÇöÀç Æ÷ÇÔÇÏ°í ÀÖ´Â »óÅÂ¿Í °ü°è¾÷À½.
+         * ë¸”ëŸ­ì´ ë‹¤ë¥¸ ìœ„ì¹˜ë¡œ ì´ë™ ê°€ëŠ¥í•œ íƒ€ìž…ì¸ì§€ ì²´í¬í•œë‹¤. í˜„ìž¬ í¬í•¨í•˜ê³  ìžˆëŠ” ìƒíƒœì™€ ê´€ê³„ì—…ìŒ.
          */
         public static bool IsBlockMovableType(this CellType cellType)
         {

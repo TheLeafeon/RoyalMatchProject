@@ -1,5 +1,8 @@
+ï»¿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-namespace RoyalMatch.Board
+
+namespace Ninez.Board
 {
     public class Cell
     {
@@ -37,33 +40,38 @@ namespace RoyalMatch.Board
         //-------------------------------------------------------
 
         /// <summary>
-        /// ÁÖ¾îÁø prefabÀ» ÀÌ¿ëÇØ¼­ Cell GameObject¸¦ »ı¼º(Instantiate)ÇÑ´Ù.
+        /// ì£¼ì–´ì§„ prefabì„ ì´ìš©í•´ì„œ Cell GameObjectë¥¼ ìƒì„±(Instantiate)í•œë‹¤.
         /// </summary>
         /// <param name="cellPrefab">Cell Prefab</param>
-        /// <param name="containerObj">»ı¼ºµÈ GameObjectÀÇ ºÎ¸ğ(Board GameObject)</param>
+        /// <param name="containerObj">ìƒì„±ëœ GameObjectì˜ ë¶€ëª¨(Board GameObject)</param>
         /// <returns></returns>
         public Cell InstantiateCellObj(GameObject cellPrefab, Transform containerObj)
         {
-            //1. Cell ¿ÀºêÁ§Æ®¸¦ »ı¼ºÇÑ´Ù.
+            //1. Cell ì˜¤ë¸Œì íŠ¸ë¥¼ ìƒì„±í•œë‹¤.
             GameObject newObj = Object.Instantiate(cellPrefab, new Vector3(0, 0, 0), Quaternion.identity);
 
-            //2. ÄÁÅ×ÀÌ³Ê(Board)ÀÇ Â÷ÀÏµå·Î CellÀ» Æ÷ÇÔ½ÃÅ²´Ù.
+            //2. ì»¨í…Œì´ë„ˆ(Board)ì˜ ì°¨ì¼ë“œë¡œ Cellì„ í¬í•¨ì‹œí‚¨ë‹¤.
             newObj.transform.parent = containerObj;
 
-            //3. Cell ¿ÀºêÁ§Æ®¿¡ Àû¿ëµÈ CellBehaviour ÄÄÆ÷³ÊÆ®¸¦ º¸°üÇÑ´Ù.
+            //3. Cell ì˜¤ë¸Œì íŠ¸ì— ì ìš©ëœ CellBehaviour ì»´í¬ë„ˆíŠ¸ë¥¼ ë³´ê´€í•œë‹¤.
             this.cellBehaviour = newObj.transform.GetComponent<CellBehaviour>();
 
             return this;
         }
 
         /// <summary>
-        /// Cell¿¡ ¿¬°áµÈ GameObject À§Ä¡(position)¸¦ ÀÌµ¿½ÃÅ²´Ù
+        /// Cellì— ì—°ê²°ëœ GameObject ìœ„ì¹˜(position)ë¥¼ ì´ë™ì‹œí‚¨ë‹¤
         /// </summary>
-        /// <param name="x">ÀÌµ¿ÇÒ x À§Ä¡</param>
-        /// <param name="y">ÀÌµ¿ÇÒ y À§Ä¡</param>
+        /// <param name="x">ì´ë™í•  x ìœ„ì¹˜</param>
+        /// <param name="y">ì´ë™í•  y ìœ„ì¹˜</param>
         public void Move(float x, float y)
         {
             cellBehaviour.transform.position = new Vector3(x, y);
+        }
+
+        public bool IsObstracle()
+        {
+            return type == CellType.EMPTY;
         }
     }
 }

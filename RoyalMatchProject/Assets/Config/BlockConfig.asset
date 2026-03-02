@@ -9,9 +9,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f444378a74f61bc42a2e7d0836effd73, type: 3}
+  m_Script: {fileID: 11500000, guid: cec1f94de82904afe85d04099e4565df, type: 3}
   m_Name: BlockConfig
-  m_EditorClassIdentifier: Assembly-CSharp::RoyalMatch.Scriptable.BlockConfig
+  m_EditorClassIdentifier: Assembly-CSharp::Ninez.Scriptable.BlockConfig
+  dropSpeed:
+  - 0.2
+  - 0.3
+  - 0.35
+  - 0.4
+  - 0.425
+  - 0.45
+  - 0.475
+  - 0.5
+  - 0.525
   basicBlockSprites:
   - {fileID: 7935234321397735378, guid: f4542f05912f07642bb12c62e847fb94, type: 3}
   - {fileID: 8868729072188591806, guid: c46b118861f49c34d86998cc84354cc8, type: 3}
@@ -19,3 +29,11 @@ MonoBehaviour:
   - {fileID: -3385415037828575978, guid: e04621ec09f7fb341b821d30a5df9045, type: 3}
   - {fileID: 3512498951170658160, guid: dcdd945c5cf159e45b88d777350b9210, type: 3}
   - {fileID: -6394888585581640024, guid: 00e56802131440a4ea652d29e76148ce, type: 3}
+  blockColors:
+  - {r: 0.3764706, g: 0.26666668, b: 0, a: 1}
+  - {r: 0.101960786, g: 0.5294118, b: 0.27058825, a: 1}
+  - {r: 0.36862746, g: 0.38039216, b: 0.38039216, a: 1}
+  - {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
+  - {r: 0.6, g: 0.10980392, b: 0, a: 1}
+  - {r: 0.101960786, g: 0.2, b: 0.2, a: 1}
+  explosion: {fileID: 1433481191659683625, guid: a1dae54c6ef11d8428894240fb241f14, type: 3}

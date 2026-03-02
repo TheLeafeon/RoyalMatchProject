@@ -1,12 +1,9 @@
+ï»¿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace RoyalMatch.Util
+namespace Ninez.Util
 {
-    /*
-     * 
-     * ¸¶¿ì½º¿Í ÅÍÄ¡ ÀÌº¥Æ®¸¦ ÅëÇÕ ¿¬µ¿ÇÏ´Â Å¬·¡½º, ½ÇÇà È¯°æ¿¡ µû¶ó¼­ TouchHandler ¶Ç´Â MouseHandler¸¦ »ç¿ëÇÒ Áö Á¤ÇÑ´Ù
-     * ½ºÅ×ÀÌÁöÀÇ ÄÁÅ×ÀÌ³Ê ±âÁØÀ¸·Î ÁÂÇ¥¸¦ º¯°æÇÏ°Å³ª, ½º¿ÍÀÌÇÁ µ¿ÀÛÀ» Æò°¡ÇÏ´Â µîÀÇ Ãß°¡ ¸Ş¼Òµå¸¦ Á¦°øÇÑ´Ù.
-     */
     public class InputManager
     {
         Transform m_Container;
@@ -27,15 +24,15 @@ namespace RoyalMatch.Util
         public Vector2 touch2BoardPosition => TouchToPosition(m_InputHandler.inputPosition);
 
         /*
-         * ÅÍÄ¡ ÁÂÇ¥(Screen ÁÂÇ¥)¸¦ º¸µåÀÇ ·çÆ®ÀÎ ÄÁÅ×ÀÌ³Ê ±âÁØÀ¸·Î º¯°æµÈ 2Â÷¿ø ÁÂÇ¥¸¦ ¸®ÅÏÇÑ´Ù
-         * @param vtInput Screen ÁÂÇ¥ Áï, ½ºÅ©¸° ÇÈ¼¿ ±âÁØ ÁÂÇ¥ (ÁÂÇÏ(0,0) -> ¿ì»ó(Screen.Width, Screen.Height))
+         * í„°ì¹˜ ì¢Œí‘œ(Screen ì¢Œí‘œ)ë¥¼ ë³´ë“œì˜ ë£¨íŠ¸ì¸ ì»¨í…Œì´ë„ˆ ê¸°ì¤€ìœ¼ë¡œ ë³€ê²½ëœ 2ì°¨ì› ì¢Œí‘œë¥¼ ë¦¬í„´í•œë‹¤
+         * @param vtInput Screen ì¢Œí‘œ ì¦‰, ìŠ¤í¬ë¦° í”½ì…€ ê¸°ì¤€ ì¢Œí‘œ (ì¢Œí•˜(0,0) -> ìš°ìƒ(Screen.Width, Screen.Height))
          * */
         Vector2 TouchToPosition(Vector3 vtInput)
         {
-            //1. ½ºÅ©¸° ÁÂÇ¥ -> ¿ùµå ÁÂÇ¥
+            //1. ìŠ¤í¬ë¦° ì¢Œí‘œ -> ì›”ë“œ ì¢Œí‘œ
             Vector3 vtMousePosW = Camera.main.ScreenToWorldPoint(vtInput);
 
-            //2. ÄÁÅ×ÀÌ³Ê local ÁÂÇ¥°è·Î º¯È¯(ÄÁÅ×ÀÌ³Ê À§Ä¡ ÀÌµ¿½Ã¿¡µµ ÄÁÅ×ÀÌ³Ê ±âÁØÀÇ ·ÎÄÃ ÁÂÇ¥°èÀÌ¹Ç·Î È­¸é ±¸¼ºÀÌ À¯¿¬ÇÏ´Ù)
+            //2. ì»¨í…Œì´ë„ˆ local ì¢Œí‘œê³„ë¡œ ë³€í™˜(ì»¨í…Œì´ë„ˆ ìœ„ì¹˜ ì´ë™ì‹œì—ë„ ì»¨í…Œì´ë„ˆ ê¸°ì¤€ì˜ ë¡œì»¬ ì¢Œí‘œê³„ì´ë¯€ë¡œ í™”ë©´ êµ¬ì„±ì´ ìœ ì—°í•˜ë‹¤)
             Vector3 vtContainerLocal = m_Container.transform.InverseTransformPoint(vtMousePosW);
 
             return vtContainerLocal;
@@ -47,4 +44,3 @@ namespace RoyalMatch.Util
         }
     }
 }
-

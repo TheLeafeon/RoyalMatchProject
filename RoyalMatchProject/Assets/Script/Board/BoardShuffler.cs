@@ -1,8 +1,8 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
-using RoyalMatch.Core;
+using Ninez.Core;
 
-namespace RoyalMatch.Board
+namespace Ninez.Board
 {
     using BlockVectorKV = KeyValuePair<Block, Vector2Int>;
 
@@ -24,13 +24,13 @@ namespace RoyalMatch.Board
 
         public void Shuffle(bool bAnimation = false)
         {
-            //1. ¼ÅÇÃ ´ëºñÇØ¼­ °¢ ºí·°ÀÇ ¸ÅÄª Á¤º¸¸¦ ¾÷µ¥ÀÌÆ®ÇÑ´Ù
+            //1. ì…”í”Œ ëŒ€ë¹„í•´ì„œ ê° ë¸”ëŸ­ì˜ ë§¤ì¹­ ì •ë³´ë¥¼ ì—…ë°ì´íŠ¸í•œë‹¤
             PrepareDuplicationDatas();
 
-            //2. ¼ÅÇÃ ´ë»ó ºí·°À» º°µµ ¸®½ºÆ®¿¡ º¸°üÇÑ´Ù
+            //2. ì…”í”Œ ëŒ€ìƒ ë¸”ëŸ­ì„ ë³„ë„ ë¦¬ìŠ¤íŠ¸ì— ë³´ê´€í•œë‹¤
             PrepareShuffleBlocks();
 
-            //3. 1), 2)¿¡¼­ ÁØºñÇÑ µ¥ÀÌÅÍ¸¦ ÀÌ¿ëÇÏ¿© ¼ÅÇÃÀ» ¼öÇàÇÑ´Ù.
+            //3. 1), 2)ì—ì„œ ì¤€ë¹„í•œ ë°ì´í„°ë¥¼ ì´ìš©í•˜ì—¬ ì…”í”Œì„ ìˆ˜í–‰í•œë‹¤.
             RunShuffle(bAnimation);
         }
 
@@ -48,9 +48,9 @@ namespace RoyalMatch.Board
         }
 
         /*
-         * ÀüÃ¼ ºí·°ÀÇ Áßº¹Á¤º¸¸¦ °è»êÇÑ´Ù. 
-         * Áßº¹Á¤º¸¸¦ ½ºÅ×ÀÌÁö ½ÃÀÛ½Ã ¶Ç´Â shuffle½Ã °¢ ºí·°¿¡ ÇØ´ç Á¤º¸°¡ ÀúÀåÇÑ´Ù.
-         * ¼ÅÇÃÀÌ ´ë»ó ºí·°Àº 0À¸·Î ÃÊ±âÈ­ µÇ°í, ¹Ì´ë»ó ºí·°Àº Áßº¹Á¤º¸¸¦ ¾÷µ¥ÀÌÆ®ÇÑ´Ù        
+         * ì „ì²´ ë¸”ëŸ­ì˜ ì¤‘ë³µì •ë³´ë¥¼ ê³„ì‚°í•œë‹¤. 
+         * ì¤‘ë³µì •ë³´ë¥¼ ìŠ¤í…Œì´ì§€ ì‹œì‘ì‹œ ë˜ëŠ” shuffleì‹œ ê° ë¸”ëŸ­ì— í•´ë‹¹ ì •ë³´ê°€ ì €ì¥í•œë‹¤.
+         * ì…”í”Œì´ ëŒ€ìƒ ë¸”ëŸ­ì€ 0ìœ¼ë¡œ ì´ˆê¸°í™” ë˜ê³ , ë¯¸ëŒ€ìƒ ë¸”ëŸ­ì€ ì¤‘ë³µì •ë³´ë¥¼ ì—…ë°ì´íŠ¸í•œë‹¤        
          */
         void PrepareDuplicationDatas()
         {
@@ -64,15 +64,15 @@ namespace RoyalMatch.Board
 
                     if (m_Board.CanShuffle(nRow, nCol, m_bLoadingMode))
                         block.ResetDuplicationInfo();
-                    //¿òÁ÷ÀÌÁö ¸øÇÏ´Â ºí·°(¹åÁÙ¿¡ ¹­ÀÎ °æ¿ì µî ÇöÀç»óÅÂ¿¡¼­ ÀÌµ¿ºÒ°¡ÇÑ ºí·°)ÀÇ ¸ÅÄª Á¤º¸¸¦ °è»êÇÑ´Ù.
+                    //ì›€ì§ì´ì§€ ëª»í•˜ëŠ” ë¸”ëŸ­(ë°§ì¤„ì— ë¬¶ì¸ ê²½ìš° ë“± í˜„ì¬ìƒíƒœì—ì„œ ì´ë™ë¶ˆê°€í•œ ë¸”ëŸ­)ì˜ ë§¤ì¹­ ì •ë³´ë¥¼ ê³„ì‚°í•œë‹¤.
                     else
                     {
                         block.horzDuplicate = 1;
                         block.vertDuplicate = 1;
 
-                        //ÁÂÇÏ À§Ä¡¿¡ ¼ÅÇÃ ¹Ì´ë»ó(Áï, ¿òÁ÷ÀÌÁö ¸øÇÏ´Â ºí·°)ÀÎ ºí·°ÀÇ ¸ÅÄ¡ »óÅÂ¸¦ ¹İ¿µÇÑ´Ù.
-                        //(3°³ÀÌ»ó ¸ÅÄ¡µÇ´Â °æ¿ì´Â ¹ß»ıÇÏÁö ¾Ê±â ¶§¹®¿¡ ÀÎÁ¢ÇÑ ºí·°¸¸ °Ë»çÇÏ¸é µÈ´Ù)
-                        //Note : ÁÂÇÏ¸¸ °è»êÇØµµ ÀüÃ¼ ºí·°À» ¸ğµÎ °Ë»çÇÒ ¼ö ÀÖ´Ù
+                        //ì¢Œí•˜ ìœ„ì¹˜ì— ì…”í”Œ ë¯¸ëŒ€ìƒ(ì¦‰, ì›€ì§ì´ì§€ ëª»í•˜ëŠ” ë¸”ëŸ­)ì¸ ë¸”ëŸ­ì˜ ë§¤ì¹˜ ìƒíƒœë¥¼ ë°˜ì˜í•œë‹¤.
+                        //(3ê°œì´ìƒ ë§¤ì¹˜ë˜ëŠ” ê²½ìš°ëŠ” ë°œìƒí•˜ì§€ ì•Šê¸° ë•Œë¬¸ì— ì¸ì ‘í•œ ë¸”ëŸ­ë§Œ ê²€ì‚¬í•˜ë©´ ëœë‹¤)
+                        //Note : ì¢Œí•˜ë§Œ ê³„ì‚°í•´ë„ ì „ì²´ ë¸”ëŸ­ì„ ëª¨ë‘ ê²€ì‚¬í•  ìˆ˜ ìˆë‹¤
                         if (nCol > 0 && !m_Board.CanShuffle(nRow, nCol - 1, m_bLoadingMode) && m_Board.blocks[nRow, nCol - 1].IsSafeEqual(block))
                         {
                             block.horzDuplicate = 2;
@@ -89,8 +89,8 @@ namespace RoyalMatch.Board
         }
 
         /* 
-         * ¼ÅÇÃ ´ë»ó ºí·°À» º°µµÀÇ Sorted ¸®½ºÆ®¿¡ º¸°üÇÑ´Ù.
-         * ·£´ı°ª¿¡ µû¶ó ºí·°ÀÌ Á¤·ÄµÇ¸é¼­ ¼¯ÀÎ´Ù.
+         * ì…”í”Œ ëŒ€ìƒ ë¸”ëŸ­ì„ ë³„ë„ì˜ Sorted ë¦¬ìŠ¤íŠ¸ì— ë³´ê´€í•œë‹¤.
+         * ëœë¤ê°’ì— ë”°ë¼ ë¸”ëŸ­ì´ ì •ë ¬ë˜ë©´ì„œ ì„ì¸ë‹¤.
          */
         void PrepareShuffleBlocks()
         {
@@ -100,7 +100,7 @@ namespace RoyalMatch.Board
                     if (!m_Board.CanShuffle(nRow, nCol, m_bLoadingMode))
                         continue;
 
-                    //Sorted List¿¡ ¼ø¼­¸¦ Á¤ÇÏ±â À§ÇØ¼­ Áßº¹°ªÀÌ ¾øµµ·Ï ·£´ı °ªÀ» »ı¼ºÇÑÈÄ Å°°ªÀ¸·Î ÀúÀåÇÑ´Ù
+                    //Sorted Listì— ìˆœì„œë¥¼ ì •í•˜ê¸° ìœ„í•´ì„œ ì¤‘ë³µê°’ì´ ì—†ë„ë¡ ëœë¤ ê°’ì„ ìƒì„±í•œí›„ í‚¤ê°’ìœ¼ë¡œ ì €ì¥í•œë‹¤
                     while (true)
                     {
                         int nRandom = UnityEngine.Random.Range(0, 10000);
@@ -117,7 +117,7 @@ namespace RoyalMatch.Board
         }
 
         /*
-         * ÀüÃ¼ ºí·°À» ¼¯´Â´Ù
+         * ì „ì²´ ë¸”ëŸ­ì„ ì„ëŠ”ë‹¤
          */
         void RunShuffle(bool bAnimation)
         {
@@ -130,25 +130,25 @@ namespace RoyalMatch.Board
 
                     m_Board.blocks[nRow, nCol] = GetShuffledBlock(nRow, nCol);
                 }
-            }
-        }
+            } 
+        } 
 
         /**
-         * ÁöÁ¤µÈ À§Ä¡¿¡ ¹èÄ¡ÇÒ ¼ö ÀÖ´Â 3¸ÅÄ¡µÇÁö ¾Ê´Â ºí·°À» ÇÑ´Ù.
+         * ì§€ì •ëœ ìœ„ì¹˜ì— ë°°ì¹˜í•  ìˆ˜ ìˆëŠ” 3ë§¤ì¹˜ë˜ì§€ ì•ŠëŠ” ë¸”ëŸ­ì„ í•œë‹¤.
          */
         Block GetShuffledBlock(int nRow, int nCol)
         {
-            BlockBreed prevBreed = BlockBreed.NA;   //Ã³À½ ºñ±³½Ã¿¡ Á¾·ù¸¦ ÀúÀå
-            Block firstBlock = null;                //¸®½ºÆ®¸¦ ÀüºÎ Ã³¸®ÇÏ°í Å¥¸¸ ³²Àº °æ¿ì¿¡ Áßº¹ Ã¼Å© À§ÇØ »ç¿ë (Å¥¿¡¼­ ²¨³½ Ã¹¹øÂ° ºí·°)
+            BlockBreed prevBreed = BlockBreed.NA;   //ì²˜ìŒ ë¹„êµì‹œì— ì¢…ë¥˜ë¥¼ ì €ì¥
+            Block firstBlock = null;                //ë¦¬ìŠ¤íŠ¸ë¥¼ ì „ë¶€ ì²˜ë¦¬í•˜ê³  íë§Œ ë‚¨ì€ ê²½ìš°ì— ì¤‘ë³µ ì²´í¬ ìœ„í•´ ì‚¬ìš© (íì—ì„œ êº¼ë‚¸ ì²«ë²ˆì§¸ ë¸”ëŸ­)
 
-            bool bUseQueue = true;  //true : Å¥¿¡¼­ ²¨³¿, false : ¸®½ºÆ®¿¡¼­ ²¨³¿
+            bool bUseQueue = true;  //true : íì—ì„œ êº¼ëƒ„, false : ë¦¬ìŠ¤íŠ¸ì—ì„œ êº¼ëƒ„
             while (true)
             {
-                //1. Queue¿¡¼­ ºí·°À» ÇÏ³ª ²¨³½´Ù. Ã¹¹øÀç ÈÄº¸ÀÌ´Ù.
+                //1. Queueì—ì„œ ë¸”ëŸ­ì„ í•˜ë‚˜ êº¼ë‚¸ë‹¤. ì²«ë²ˆì¬ í›„ë³´ì´ë‹¤.
                 BlockVectorKV blockInfo = NextBlock(bUseQueue);
                 Block block = blockInfo.Key;
 
-                //2. ¸®½ºÆ®¿¡¼­ ºí·°À» ÀüºÎ Ã³¸®ÇÑ °æ¿ì : ÀüÃ¼ ·çÇÁ(for ¹® Æ÷ÇÔ)¿¡¼­ 1È¸¸¸ ¹ß»ı
+                //2. ë¦¬ìŠ¤íŠ¸ì—ì„œ ë¸”ëŸ­ì„ ì „ë¶€ ì²˜ë¦¬í•œ ê²½ìš° : ì „ì²´ ë£¨í”„(for ë¬¸ í¬í•¨)ì—ì„œ 1íšŒë§Œ ë°œìƒ
                 if (block == null)
                 {
                     blockInfo = NextBlock(true);
@@ -157,29 +157,29 @@ namespace RoyalMatch.Board
 
                 Debug.Assert(block != null, $"block can't be null : queue  count -> {m_UnusedBlocks.Count}");
 
-                if (prevBreed == BlockBreed.NA) //Ã¹ºñ±³½Ã Á¾·ù ÀúÀå
+                if (prevBreed == BlockBreed.NA) //ì²«ë¹„êµì‹œ ì¢…ë¥˜ ì €ì¥
                     prevBreed = block.breed;
 
-                //3. ¸®½ºÆ®¸¦ ¸ğµÎ Ã³¸® ÇÑ °æ¿ì
+                //3. ë¦¬ìŠ¤íŠ¸ë¥¼ ëª¨ë‘ ì²˜ë¦¬ í•œ ê²½ìš°
                 if (m_bListComplete)
                 {
                     if (firstBlock == null)
                     {
-                        //3.1 ÀüÃ¼ ¸®½ºÆ®¸¦ Ã³¸®ÇÏ°í, Ã³À½À¸·Î Å¥¿¡¼­ ²¨³½ °æ¿ì
-                        firstBlock = block;  // Å¥¿¡¼­ ²¨³½ Ã¹¹øÂ° ºí·°
+                        //3.1 ì „ì²´ ë¦¬ìŠ¤íŠ¸ë¥¼ ì²˜ë¦¬í•˜ê³ , ì²˜ìŒìœ¼ë¡œ íì—ì„œ êº¼ë‚¸ ê²½ìš°
+                        firstBlock = block;  // íì—ì„œ êº¼ë‚¸ ì²«ë²ˆì§¸ ë¸”ëŸ­
                     }
                     else if (System.Object.ReferenceEquals(firstBlock, block))
                     {
-                        //3.2 Ã³À½ º¸¾Ò´ø ºí·°À» ´Ù½Ã Ã³¸®ÇÏ´Â °æ¿ì, 
-                        //    Áï, Å¥¿¡ µé¾îÀÖ´Â ¸ğµç ºí·°ÀÌ Á¶°Ç¿¡ ¸ÂÁö ¾Ê´Â °æ¿ì (³²Àº ºí·° Áß¿¡ Á¶°Ç¿¡ ¸Â´Â°Ô ¾ø´Â °æ¿ì)
+                        //3.2 ì²˜ìŒ ë³´ì•˜ë˜ ë¸”ëŸ­ì„ ë‹¤ì‹œ ì²˜ë¦¬í•˜ëŠ” ê²½ìš°, 
+                        //    ì¦‰, íì— ë“¤ì–´ìˆëŠ” ëª¨ë“  ë¸”ëŸ­ì´ ì¡°ê±´ì— ë§ì§€ ì•ŠëŠ” ê²½ìš° (ë‚¨ì€ ë¸”ëŸ­ ì¤‘ì— ì¡°ê±´ì— ë§ëŠ”ê²Œ ì—†ëŠ” ê²½ìš°)
                         m_Board.ChangeBlock(block, prevBreed);
                     }
                 }
 
-                //4. »óÇÏÁÂ¿ì ÀÎÁ¢ ºí·°°ú °ãÄ¡´Â °³¼ö¸¦ °è»êÇÑ´Ù
+                //4. ìƒí•˜ì¢Œìš° ì¸ì ‘ ë¸”ëŸ­ê³¼ ê²¹ì¹˜ëŠ” ê°œìˆ˜ë¥¼ ê³„ì‚°í•œë‹¤
                 Vector2Int vtDup = CalcDuplications(nRow, nCol, block);
 
-                //5. 2°³ ÀÌ»ó ¸ÅÄ¡µÇ´Â °æ¿ì, ÇöÀç À§Ä¡¿¡ ÇØ´ç ºí·°ÀÌ ¿Ã ¼ö ¾øÀ¸¹Ç·Î Å¥¿¡ º¸°üÇÏ°í ´ÙÀ½ ºí·° Ã³¸®ÇÏµµ·Ï continueÇÑ´Ù
+                //5. 2ê°œ ì´ìƒ ë§¤ì¹˜ë˜ëŠ” ê²½ìš°, í˜„ì¬ ìœ„ì¹˜ì— í•´ë‹¹ ë¸”ëŸ­ì´ ì˜¬ ìˆ˜ ì—†ìœ¼ë¯€ë¡œ íì— ë³´ê´€í•˜ê³  ë‹¤ìŒ ë¸”ëŸ­ ì²˜ë¦¬í•˜ë„ë¡ continueí•œë‹¤
                 if (vtDup.x > 2 || vtDup.y > 2)
                 {
                     m_UnusedBlocks.Enqueue(blockInfo);
@@ -188,7 +188,7 @@ namespace RoyalMatch.Board
                     continue;
                 }
 
-                //6. ºí·°ÀÌ À§Ä¡ÇÒ ¼ö ÀÖ´Â °æ¿ì, Ã£Àº À§Ä¡·Î Bock GameObject¸¦ ÀÌµ¿½ÃÅ²´Ù.
+                //6. ë¸”ëŸ­ì´ ìœ„ì¹˜í•  ìˆ˜ ìˆëŠ” ê²½ìš°, ì°¾ì€ ìœ„ì¹˜ë¡œ Bock GameObjectë¥¼ ì´ë™ì‹œí‚¨ë‹¤.
                 block.vertDuplicate = vtDup.y;
                 block.horzDuplicate = vtDup.x;
                 if (block.blockObj != null)
@@ -198,13 +198,13 @@ namespace RoyalMatch.Board
                     block.Move(initX + nCol, initY + nRow);
                 }
 
-                //7. Ã£Àº ºí·°À» ¸®ÅÏÇÑ´Ù.
+                //7. ì°¾ì€ ë¸”ëŸ­ì„ ë¦¬í„´í•œë‹¤.
                 return block;
             }
         }
 
         /**
-         * »óÇÏÁÂ¿ì ÀÎÁ¢ ºí·°°ú °ãÄ¡´Â °³¼ö¸¦ °è»êÇÑ´Ù
+         * ìƒí•˜ì¢Œìš° ì¸ì ‘ ë¸”ëŸ­ê³¼ ê²¹ì¹˜ëŠ” ê°œìˆ˜ë¥¼ ê³„ì‚°í•œë‹¤
          */
         Vector2Int CalcDuplications(int nRow, int nCol, Block block)
         {
@@ -221,7 +221,7 @@ namespace RoyalMatch.Board
                 Block rightBlock = m_Board.blocks[nRow, nCol + 1];
                 colDup += rightBlock.horzDuplicate;
 
-                //¼ÅÇÃ ¹Ì´ë»óºí·°ÀÌ ÇöÀç ºí·°°ú Áßº¹µÇ´Â °æ¿ì, ¼ÅÇÃ¹Ì´ë»ó ºí·°ÀÇ Áßº¹ Á¤º¸µµ ÇÔ°Ô ¾÷µ¥ÀÌÆ®ÇÑ´Ù
+                //ì…”í”Œ ë¯¸ëŒ€ìƒë¸”ëŸ­ì´ í˜„ì¬ ë¸”ëŸ­ê³¼ ì¤‘ë³µë˜ëŠ” ê²½ìš°, ì…”í”Œë¯¸ëŒ€ìƒ ë¸”ëŸ­ì˜ ì¤‘ë³µ ì •ë³´ë„ í•¨ê²Œ ì—…ë°ì´íŠ¸í•œë‹¤
                 if (rightBlock.horzDuplicate == 1)
                     rightBlock.horzDuplicate = 2;
             }
@@ -231,7 +231,7 @@ namespace RoyalMatch.Board
                 Block upperBlock = m_Board.blocks[nRow + 1, nCol];
                 rowDup += upperBlock.vertDuplicate;
 
-                //¼ÅÇÃ ¹Ì´ë»óºí·°ÀÌ ÇöÀç ºí·°°ú Áßº¹µÇ´Â °æ¿ì, ¼ÅÇÃ¹Ì´ë»ó ºí·°ÀÇ Áßº¹ Á¤º¸µµ ÇÔ°Ô ¾÷µ¥ÀÌÆ®ÇÑ´Ù
+                //ì…”í”Œ ë¯¸ëŒ€ìƒë¸”ëŸ­ì´ í˜„ì¬ ë¸”ëŸ­ê³¼ ì¤‘ë³µë˜ëŠ” ê²½ìš°, ì…”í”Œë¯¸ëŒ€ìƒ ë¸”ëŸ­ì˜ ì¤‘ë³µ ì •ë³´ë„ í•¨ê²Œ ì—…ë°ì´íŠ¸í•œë‹¤
                 if (upperBlock.vertDuplicate == 1)
                     upperBlock.vertDuplicate = 2;
             }

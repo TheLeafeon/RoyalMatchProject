@@ -1,18 +1,13 @@
+ï»¿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace RoyalMatch.Util
+namespace Ninez.Util
 {
-    /*
-     * ¸¶¿ì½º¿Í ÅÍÄ¡ ÀÌº¥Æ® Ã³¸®¸¦ µ¿ÀÏÇÑ ÇÁ·ÎÅäÅ¸ÀÔÀ¸·Î Ã³¸®ÇÒ ¼ö ÀÖµµ·Ï,
-     * InputHandler ÀÎÅÍÆäÀÌ½º¸¦ Á¤ÀÇÇÑ´Ù.
-     * 3 ¸ÅÄ¡ °ÔÀÓ¿¡ ÇÊ¿äÇÑ up down ÀÌº¥Æ®¸¸ Ã³¸®ÇÏ´Â Á¦ÇÑµÈ ±â´É¸¸ Á¦°øÇÑ´Ù.
-     */
-
     public interface IInputHandlerBase
     {
         bool isInputDown { get; }
-        bool isInputUp { get; }
-        Vector2 inputPosition { get; } //Screen(ÇÈ¼¿) ÁÂÇ¥
+        bool isInputUp{ get; }
+        Vector2 inputPosition { get; } //Screen(í”½ì…€) ì¢Œí‘œ
     }
 }
-

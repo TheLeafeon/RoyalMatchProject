@@ -1,6 +1,8 @@
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace RoyalMatch.Board
+namespace Ninez.Board
 {
     public static class BlockFactory
     {
@@ -9,9 +11,9 @@ namespace RoyalMatch.Board
             Block block = new Block(blockType);
 
             //Set Breed
-            if (blockType == BlockType.BASIC)
+            if(blockType == BlockType.BASIC)
                 block.breed = (BlockBreed)UnityEngine.Random.Range(0, 6);
-            else if (blockType == BlockType.EMPTY)
+            else if(blockType == BlockType.EMPTY)
                 block.breed = BlockBreed.NA;
 
             return block;
